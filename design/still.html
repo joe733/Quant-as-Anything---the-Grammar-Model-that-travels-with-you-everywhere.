@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Quant — Still</title>
+<style>
+:root{color-scheme:dark;--bg:#0a0a0b;--ink:#ece9e3;--muted:#8f8b93;--line:rgba(236,233,227,.12)}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:ui-serif,Georgia,Cambria,"Times New Roman",serif}
+body{display:grid;place-items:center;padding:24px}
+main{width:min(720px,100%);min-height:min(760px,calc(100vh - 48px));display:grid;grid-template-rows:auto 1fr auto;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+header{display:flex;align-items:center;padding:18px 0;color:var(--muted);font:500 10px/1 ui-sans-serif,system-ui,sans-serif;letter-spacing:.22em;text-transform:uppercase}
+header strong{color:var(--ink);font-weight:500;letter-spacing:.28em}.state{margin-left:auto;opacity:.65}
+.log{padding:11vh 0 48px;overflow:auto;scrollbar-width:none}.log::-webkit-scrollbar{display:none}
+.message{max-width:650px;margin:0 0 30px;font-size:clamp(19px,2.4vw,28px);line-height:1.5;letter-spacing:-.014em;white-space:pre-wrap;text-wrap:pretty}.user{margin-left:auto;max-width:520px;color:#bcb8c0;font-size:clamp(15px,1.7vw,19px);font-style:italic}.empty{margin-top:17vh;text-align:center;color:rgba(236,233,227,.42);font-size:clamp(20px,2.6vw,30px);font-style:italic}
+form{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:end;border-top:1px solid var(--line);padding:17px 0 18px}
+textarea{resize:none;border:0;outline:0;background:transparent;color:var(--ink);font:400 18px/1.45 ui-serif,Georgia,serif;min-height:30px;max-height:120px;padding:2px 0}textarea::placeholder{color:rgba(236,233,227,.33);font-style:italic}
+button{appearance:none;border:0;border-bottom:1px solid transparent;background:transparent;color:var(--muted);padding:4px 0;cursor:pointer;font:500 10px ui-sans-serif,system-ui,sans-serif;letter-spacing:.18em;text-transform:uppercase}button:hover{color:var(--ink);border-color:var(--line)}button:disabled{opacity:.3}
+.pulse{display:inline-block;width:4px;height:4px;margin-right:10px;border-radius:50%;background:#c8bdd3;opacity:.55;transition:opacity .5s ease,transform .5s ease}.attending .pulse{opacity:1;transform:scale(1.75)}.speaking .pulse{opacity:.78;transform:scale(1.25)}
+@media(max-width:600px){body{padding:14px}main{min-height:calc(100vh - 28px)}.log{padding-top:9vh}.message{font-size:20px}}
+</style>
+</head>
+<body>
+<main id="surface">
+<header><span class="pulse"></span><strong>Quant</strong><span>&nbsp;as Anything</span><span class="state" id="state">being</span></header>
+<section class="log" id="log"><div class="empty" id="empty">What are we looking at?</div></section>
+<form id="form"><textarea id="input" rows="1" placeholder="Say something…"></textarea><button id="send">ask</button></form>
+</main>
+<script>
+const API='http://127.0.0.1:8765';
+const surface=document.querySelector('#surface'),log=document.querySelector('#log'),empty=document.querySelector('#empty'),form=document.querySelector('#form'),input=document.querySelector('#input'),send=document.querySelector('#send'),state=document.querySelector('#state');
+function setState(s){state.textContent=s;surface.className=s;}
+function add(role,text){empty?.remove();const el=document.createElement('div');el.className='message '+role;el.textContent=text;log.appendChild(el);log.scrollTo({top:log.scrollHeight,behavior:'smooth'});}
+async function ask(text){add('user',text);setState('attending');send.disabled=true;try{const r=await fetch(API+'/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text})});if(!r.ok)throw new Error();const data=await r.json();setState('speaking');add('quant',data.reply||'I could not form that cleanly.');}catch(_){setState('speaking');add('quant','I am here, but the local Quant runtime is not running yet.');}finally{setTimeout(()=>setState('being'),850);send.disabled=false;input.focus();}}
+form.addEventListener('submit',e=>{e.preventDefault();const text=input.value.trim();if(!text)return;input.value='';input.style.height='auto';ask(text)});
+input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();form.requestSubmit()}});
+input.addEventListener('input',()=>{input.style.height='auto';input.style.height=Math.min(input.scrollHeight,120)+'px'});
+</script>
+</body>
+</html>
