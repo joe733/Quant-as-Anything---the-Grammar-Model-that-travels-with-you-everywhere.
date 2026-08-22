@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Quant as Anything</title>
+<style>
+:root{color-scheme:dark;--bg:#07080c;--ink:#eeeae2;--muted:#9b96a6;--violet:#b8a9c9;--line:rgba(255,255,255,.08)}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:ui-serif,Georgia,Cambria,"Times New Roman",serif;color:var(--ink)}
+canvas{position:fixed;inset:0;width:100%;height:100%;display:block}
+.shell{position:relative;z-index:2;width:min(760px,calc(100% - 32px));height:100%;margin:auto;display:grid;grid-template-rows:auto 1fr auto;padding:24px 0 28px}
+header{display:flex;align-items:center;gap:14px;padding:0 4px;color:var(--muted);font:500 11px/1 ui-sans-serif,system-ui,sans-serif;letter-spacing:.22em;text-transform:uppercase}
+.brand{color:var(--ink);letter-spacing:.28em}.dot{width:5px;height:5px;border-radius:50%;background:var(--violet);box-shadow:0 0 18px var(--violet)}.state{margin-left:auto;opacity:.7}
+.log{overflow:auto;scrollbar-width:none;padding:11vh 4px 40px;mask-image:linear-gradient(to bottom,transparent 0,#000 8%,#000 92%,transparent 100%)}.log::-webkit-scrollbar{display:none}
+.message{max-width:680px;margin:0 0 28px;white-space:pre-wrap;font-size:clamp(18px,2.1vw,25px);line-height:1.48;letter-spacing:-.012em;text-wrap:pretty}.user{margin-left:auto;max-width:560px;color:#c8c3cd;font-size:clamp(15px,1.6vw,19px);font-style:italic}.quant strong{font-weight:600}.empty{text-align:center;margin-top:18vh;color:rgba(238,234,226,.52);font-size:clamp(18px,2vw,24px);font-style:italic;letter-spacing:.015em}
+.composer{border-top:1px solid var(--line);display:grid;grid-template-columns:1fr auto;gap:14px;align-items:end;padding:18px 4px 0;background:linear-gradient(to top,rgba(7,8,12,.96),rgba(7,8,12,.62) 65%,transparent)}
+textarea{resize:none;border:0;outline:0;background:transparent;color:var(--ink);font:400 18px/1.45 ui-serif,Georgia,serif;min-height:31px;max-height:126px;padding:3px 0}textarea::placeholder{color:rgba(238,234,226,.38);font-style:italic}
+button{border:1px solid var(--line);background:rgba(255,255,255,.025);color:var(--ink);border-radius:999px;padding:9px 13px;cursor:pointer;font:500 11px ui-sans-serif,system-ui,sans-serif;letter-spacing:.13em;text-transform:uppercase}button:hover{background:rgba(255,255,255,.06)}button:disabled{opacity:.35;cursor:default}
+.badge{position:fixed;right:18px;bottom:18px;z-index:3;color:rgba(238,234,226,.34);font:500 9px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.12em}
+@media(max-width:600px){.shell{width:calc(100% - 24px);padding-top:16px}.log{padding-top:9vh}.message{font-size:19px}.badge{display:none}}
+</style>
+</head>
+<body>
+<canvas id="field"></canvas>
+<div class="shell">
+  <header><span class="dot"></span><span class="brand">Quant</span><span>as Anything</span><span class="state" id="state">being</span></header>
+  <main class="log" id="log"><div class="empty" id="empty">What are we looking at?</div></main>
+  <form class="composer" id="form"><textarea id="input" rows="1" autocomplete="off" placeholder="Say something…"></textarea><button id="send">ask</button></form>
+</div>
+<div class="badge">LOCAL · CLEAN PROSE SURFACE</div>
+<script>
+const API='http://127.0.0.1:8765';
+const log=document.querySelector('#log'),empty=document.querySelector('#empty'),form=document.querySelector('#form'),input=document.querySelector('#input'),send=document.querySelector('#send'),state=document.querySelector('#state');
+let activity=.06,targetActivity=.06;
+function add(role,text){empty?.remove();const el=document.createElement('div');el.className='message '+role;el.textContent=text;log.appendChild(el);log.scrollTo({top:log.scrollHeight,behavior:'smooth'});}
+function setState(s){state.textContent=s;targetActivity=s==='attending'?1:s==='speaking'?.65:.06;}
+async function ask(text){add('user',text);setState('attending');send.disabled=true;try{const r=await fetch(API+'/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text})});if(!r.ok)throw new Error('offline');const data=await r.json();setState('speaking');add('quant',data.reply||'I could not form that cleanly.');}catch(_){setState('speaking');add('quant','I am here, but the local Quant runtime is not running yet. Start `python3 code/quant.py --serve`, then ask me again.');}finally{setTimeout(()=>setState('being'),900);send.disabled=false;input.focus();}}
+form.addEventListener('submit',e=>{e.preventDefault();const text=input.value.trim();if(!text)return;input.value='';input.style.height='auto';ask(text)});
+input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();form.requestSubmit()}});input.addEventListener('input',()=>{input.style.height='auto';input.style.height=Math.min(input.scrollHeight,126)+'px'});
+
+const c=document.querySelector('#field'),ctx=c.getContext('2d');let w,h,dpr,pts=[];
+function resize(){dpr=Math.min(devicePixelRatio||1,2);w=innerWidth;h=innerHeight;c.width=w*dpr;c.height=h*dpr;c.style.width=w+'px';c.style.height=h+'px';ctx.setTransform(dpr,0,0,dpr,0,0);const n=Math.min(220,Math.max(90,Math.floor(w*h/8500)));pts=Array.from({length:n},()=>({x:Math.random()*w,y:Math.random()*h,r:.35+Math.random()*1.25,a:.08+Math.random()*.35,vx:(Math.random()-.5)*.09,vy:(Math.random()-.5)*.09,p:Math.random()*6.28}));}
+function draw(t){activity+=(targetActivity-activity)*.025;ctx.clearRect(0,0,w,h);const g=ctx.createRadialGradient(w*.52,h*.46,0,w*.52,h*.46,Math.max(w,h)*.72);g.addColorStop(0,`rgba(67,48,82,${.08+.09*activity})`);g.addColorStop(.45,`rgba(24,28,47,${.08+.05*activity})`);g.addColorStop(1,'rgba(7,8,12,0)');ctx.fillStyle=g;ctx.fillRect(0,0,w,h);for(const p of pts){const speed=1+activity*10;p.p+=.0025*speed;p.x+=p.vx*speed+Math.cos(p.p)*.012*speed;p.y+=p.vy*speed+Math.sin(p.p*.8)*.012*speed;if(p.x<-10)p.x=w+10;if(p.x>w+10)p.x=-10;if(p.y<-10)p.y=h+10;if(p.y>h+10)p.y=-10;ctx.beginPath();ctx.arc(p.x,p.y,p.r*(1+activity*.28),0,Math.PI*2);ctx.fillStyle=`rgba(214,207,225,${p.a*(.52+activity*.48)})`;ctx.fill();}requestAnimationFrame(draw)}
+addEventListener('resize',resize);resize();requestAnimationFrame(draw);
+</script>
+</body>
+</html>
