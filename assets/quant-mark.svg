@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title desc">
+  <title id="title">Quant mark</title>
+  <desc id="desc">A quiet orbital Q formed from a circle, aperture, and small satellite point.</desc>
+  <rect width="128" height="128" rx="28" fill="#08090d"/>
+  <circle cx="62" cy="60" r="33" fill="none" stroke="#e8e4dc" stroke-width="3" opacity=".92"/>
+  <circle cx="62" cy="60" r="20" fill="none" stroke="#9d95b2" stroke-width="1.5" opacity=".6"/>
+  <path d="M82 83 L101 101" fill="none" stroke="#e8e4dc" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="95" cy="35" r="4" fill="#b8a9c9"/>
+  <circle cx="40" cy="83" r="2" fill="#e8e4dc" opacity=".7"/>
+</svg>
