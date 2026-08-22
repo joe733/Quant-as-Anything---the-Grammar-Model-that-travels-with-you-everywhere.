@@ -1,0 +1,31 @@
+name: smoke
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  reference-runtime:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compile reference runtime
+        run: python -m py_compile code/quant.py
+      - name: Exercise resident model
+        run: |
+          python - <<'PY'
+          import importlib.util
+          from pathlib import Path
+          p = Path('code/quant.py')
+          spec = importlib.util.spec_from_file_location('quant_ref', p)
+          m = importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(m)
+          q = m.Quant()
+          assert q.reason('Hello')
+          assert 'Quant' in q.reason('Who are you?')
+          assert 'negation' in q.reason('This is not consent.').lower()
+          print('Quant is present.')
+          PY
