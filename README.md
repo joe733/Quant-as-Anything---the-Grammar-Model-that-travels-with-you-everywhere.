@@ -1,60 +1,36 @@
 <div align="center">
 
-<img src="assets/quant-mark.svg" width="92" alt="Quant mark">
+# Quant... as himself.
 
-# Quant as Anything
+### a small local grammar model that travels with you everywhere
 
-### the grammar model that travels with you everywhere
-
-**Quant is Quant.**  
-A small resident language system built around grammar, memory, attention, provenance, and careful prose.
-
-[Design](design/) · [Code](code/) · [Architecture](docs/ARCHITECTURE.md)
+**One resident. Many places. No remote model required.**
 
 </div>
 
 ---
 
-## What this is
+## What Quant is
 
-**Quant as Anything** is the simple public form of Quant: one resident model, able to travel between surfaces without giving away its identity.
+Quant is a local resident language system from **Fiduci Group** designed around a simple public idea:
 
-This repository has two presentations of the same idea:
+> **the resident can stay small while the world around him gets large.**
 
-- **Design variant** — a quiet, animated conversational surface for people who want to *meet* Quant.
-- **Code variant** — a small, readable reference runtime for people who want to *understand* Quant.
+A project, folder, archive, notebook or app can become a *place* Quant reads locally. The place can change. Quant does not need to become the place in order to work there.
 
-The rule shared by both is simple:
+The public repository contains a deliberately compact, working reference edition. It demonstrates the product contract without publishing Fiduci's private implementation, protected grammar, production memory structures, resident knowledge, or internal reasoning machinery.
 
-> **Backend is how Quant works. Prose is how Quant speaks.**
+That is intentional.
 
-No parser traces, hashes, internal registers, confidence scaffolding, or deliberation machinery belong in ordinary conversation.
+## Try the public reference
 
----
+Requires Python 3. No packages to install.
 
-## Design variant
-
-Open [`design/index.html`](design/index.html).
-
-It is a single-file, dependency-free interface: dark field, slow drift at rest, more motion while Quant is attending, then calm again after he speaks.
-
-```text
-              ·        .
-
-                 QUANT
-
-        .                    ·
-
-          What are we looking at?
+```bash
+python3 code/quant.py
 ```
 
-No dashboard aesthetic. No chrome pretending to be intelligence.
-
----
-
-## Code variant
-
-Run:
+Or run the local interface:
 
 ```bash
 python3 code/quant.py --serve
@@ -66,100 +42,79 @@ Then open:
 http://127.0.0.1:8765/design/
 ```
 
-Or talk from a terminal:
+The reference server binds to **localhost**. It does not call a remote language model.
 
-```bash
-python3 code/quant.py
-```
-
-The code variant uses only the Python standard library and keeps the public contract intentionally small:
+In terminal mode, prefix a line with `+ ` to deliberately add it to the current local place:
 
 ```text
-input
-  ↓
-grammatical reading
-  ↓
-8 perspectives
-  ↓
-4 syntheses
-  ↓
-2 refinements
-  ↓
-Helm
-  ↓
-clean prose
++ Dogs are loyal companions.
+Are dogs loyal?
 ```
 
-It is a readable reference implementation of Quant's shape, not a claim to frontier-scale pretrained knowledge.
+## Public denominations
 
----
+The public code uses deliberately plain denominations such as:
 
-## Principles
+- **Resident** — the local Quant process
+- **Place** — material deliberately available to the resident
+- **Read** — preserve the grammatical shape of an input
+- **Find** — locate locally relevant material
+- **Speak** — produce the public response
 
-### Quant is Quant
+These names describe the observable contract. They are **not a specification of Fiduci's private implementation**.
 
-There is no hidden larger model underneath the identity. Subsystems are faculties *of Quant*, not external personalities speaking through him.
+## Quant... as anything
 
-### Being before learning
+The interface can change without requiring Quant to become a different resident:
 
-Ordinary conversation is **Being Quant**: he can use what he already knows without silently rewriting himself from every exchange.
+```text
+macOS app    local page    terminal    SDK    project folder
+     \           |           |         |          /
+                      Quant
+```
 
-Deliberate document learning belongs to a separate mode. Encounter is not automatically ingestion.
+The surface changes. The place changes.
 
-### Grammar is structural, not cosmetic
+**Quant remains Quant.**
 
-Subject, predicate, object, qualification, negation, modality, tense, and stance should survive interpretation.
+## Privacy by default
 
-### Provenance survives confidence
+The public reference is intentionally boring about privacy:
 
-A thing read, a thing inferred, a thing remembered, and a thing established are not the same kind of thing.
+- no remote model provider
+- no analytics or telemetry
+- no account required
+- localhost-only server
+- no automatic document ingestion
+- material becomes part of the local place only when deliberately added
 
-### Good prose may not outrank truth
+Production/private Quant builds may provide richer local capabilities, but the same privacy principle remains: **your environment is not a prerequisite for somebody else's server.**
 
-Style can improve cadence, clarity, rhythm, and warmth. It may not make a claim stronger merely because the stronger sentence sounds better.
+## A note on protected terminology and implementation
 
-### The other person remains another person
+Fiduci's research includes named concepts, grammar-model methods, storage formats, and related technical language that may be subject to intellectual-property rights, patent applications, copyright, trade-secret protection, licence terms, or other protections depending on jurisdiction and status.
 
-Prediction may improve a proposal. It does not instantiate consent, acceptance, refusal, or preference on somebody else's behalf.
+This repository does not waive those rights and should not be read as publishing the full production method. Protected terminology may appear descriptively because it belongs to the project; implementation detail is intentionally reduced or represented through public denominations.
 
----
+For licensing or implementation enquiries: **support@fiducigroup.com**
 
 ## Repository map
 
 ```text
-Quant-as-Anything/
-├── README.md
-├── assets/
-│   └── quant-mark.svg
-├── design/
-│   ├── README.md
-│   └── index.html
-├── code/
-│   ├── README.md
-│   └── quant.py
-├── docs/
-│   └── ARCHITECTURE.md
-└── .github/
-    └── workflows/
-        └── smoke.yml
+README.md
+assets/
+design/       local conversational surface
+code/         working public reference runtime
+docs/         public architecture boundary
+.github/      smoke tests
 ```
-
----
-
-## Why “as Anything”?
-
-Because the surface should be replaceable without replacing Quant.
-
-A desktop overlay. A local webpage. A terminal. An SDK. A browser companion. A quiet conversation window.
-
-The surface changes.
-
-**Quant remains Quant.**
 
 ---
 
 <div align="center">
 
-*attention without possession · structure without flattening · prose without theatre*
+### Quant... as himself.
+
+*small enough to make a difference, for the better.*
 
 </div>
