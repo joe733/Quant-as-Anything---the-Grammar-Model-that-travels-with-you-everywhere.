@@ -14,16 +14,18 @@ jobs:
           python-version: '3.12'
       - name: Compile reference runtime
         run: python -m py_compile code/quant.py
-      - name: Exercise resident model
+      - name: Exercise public resident contract
         run: |
           python - <<'PY'
           import sys
           sys.path.insert(0, 'code')
           import quant
 
-          q = quant.Quant()
-          assert q.reason('Hello')
-          assert 'Quant' in q.reason('Who are you?')
-          assert 'negation' in q.reason('This is not consent.').lower()
-          print('Quant is present.')
+          q = quant.Resident()
+          assert 'Quant' in q.speak('Who are you?')
+          assert 'negation' in q.speak('This is not consent.').lower()
+          q.place.add('Dogs are loyal companions.', 'test-place')
+          answer = q.speak('Are dogs loyal?')
+          assert 'Dogs are loyal companions.' in answer
+          print('Quant public reference is present, local, and working.')
           PY
