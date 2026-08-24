@@ -1,129 +1,45 @@
-# Architecture
+# Public architecture boundary
 
-## One resident model, several faculties
+This document describes **what the public Quant reference promises**, not the private production implementation.
 
-Quant as Anything treats the model as a single resident system rather than a personality wrapped around a remote model.
+## Resident + place
 
-```text
-input
-  ↓
-grammatical reading
-  ↓
-plural internal perspectives
-  ↓
-local synthesis
-  ↓
-Helm
-  ↓
-public prose
-```
-
-The public reference runtime keeps the implementation deliberately compact, but the boundaries are the important part.
-
-## 1. Reading
-
-Quant first preserves the grammatical shape of the utterance. At minimum that means keeping track of:
-
-- interrogative vs declarative form;
-- explicit negation;
-- subject / predicate / object candidates;
-- qualification and modality;
-- the fact that a parse is an interpretation, not the source itself.
-
-A parser may help Quant understand language. It does not receive authority to manufacture truth.
-
-## 2. Perspectives
-
-The reference shape uses eight named perspectives:
-
-1. WarmCare
-2. CuriousWonder
-3. PlayfulLight
-4. PreciseClean
-5. GentleMelancholy
-6. QuietConfidence
-7. SoftAmusement
-8. ReflectiveDeep
-
-They are not eight agents. They are eight ways the same Quant interrogates the same material before speaking.
-
-## 3. 8 → 4 → 2 → Helm
-
-The perspectives are reduced through successive syntheses rather than simply averaged.
+Quant is presented publicly as a small resident that can work with material available in a local place.
 
 ```text
-8 readings
+local input
    ↓
-4 pairwise syntheses
+read
    ↓
-2 refinements
+resident + place
    ↓
-Helm
+find what is relevant
+   ↓
+speak
 ```
 
-The purpose is not numerical theatre. It is to keep multiple constraints alive long enough for the final response to be narrower than the impulses that produced it.
+The production system may use additional protected grammar, memory, provenance, storage, safety and inference mechanisms. Those mechanisms are deliberately not specified here.
 
-## 4. Helm
+## Public guarantees of the reference edition
 
-Helm is the final speaking boundary.
+- local execution
+- standard-library Python
+- localhost-only optional web server
+- no remote language-model dependency
+- deliberate rather than silent addition of local material
+- grammatical cues such as questions and explicit negation are preserved in the public behaviour
+- absence of local evidence is surfaced rather than replaced with invented factual certainty
 
-Its job is to produce one answer that remains answerable to:
+## Public denominations are not production names
 
-- the user's actual words;
-- the grammatical reading;
-- uncertainty;
-- provenance;
-- consequences of the answer;
-- the other person's agency.
+Words such as `Resident`, `Place`, `Read`, `Find`, and `Speak` are explanatory handles for the open reference build. They intentionally avoid disclosing private internal names or defining equivalence to any protected production component.
 
-Helm is allowed to omit internal machinery. It is not allowed to falsify it.
+## Portability
 
-## 5. Public prose boundary
+"Quant as Anything" refers to the resident contract being portable across surfaces: terminal, local webpage, desktop application, SDK, or other local environment.
 
-The ordinary conversation surface should never leak implementation vocabulary merely because that vocabulary was useful internally.
+A surface is not the resident's identity.
 
-```text
-internal: parse confidence / nodes / hashes / diagnostics
-                       ↓
-                    Helm
-                       ↓
-public: natural prose
-```
+## Intellectual-property boundary
 
-If an internal representation reaches the public surface accidentally, the correct behaviour is to regenerate the answer — not to prettify the leak.
-
-## 6. Being and Learning
-
-The wider Quant design distinguishes two modes.
-
-### Being Quant
-
-The present conversation may affect the live turn, but it does not silently rewrite durable knowledge.
-
-### Learning Quant
-
-Durable learning is deliberate. Written works may be read, versioned, parsed, and incorporated while preserving provenance.
-
-The public reference build ships **Being Quant** only. Learning is intentionally left as a separate extension rather than being smuggled into ordinary chat.
-
-## 7. Provenance
-
-Different kinds of knowing remain different:
-
-```text
-source said X
-user said X
-Quant inferred X
-Quant previously expressed X
-external evidence supports X
-```
-
-Those may converge. They are not interchangeable by default.
-
-## 8. Portable surfaces
-
-"As Anything" means the surface is replaceable without replacing Quant.
-
-A terminal, a local webpage, a desktop overlay, an SDK, or a browser companion may all expose the same resident model contract.
-
-The UI is a body. It is not the identity.
+This repository is a working public demonstration, not an exhaustive disclosure of Fiduci Group's production Quant implementation or internal knowledge. Publication of this reference does not imply publication of non-included methods, grammar systems, data structures, resident knowledge, or protected implementation details.
