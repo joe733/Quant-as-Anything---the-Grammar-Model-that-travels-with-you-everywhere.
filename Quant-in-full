@@ -1,0 +1,1066 @@
+#!/usr/bin/env python3
+"""
+Quant-as-Quant.py
+=================
+Canonical single-file Quant engine.
+
+This file unifies the established Quant architecture:
+- Inner shape: 8 emotional vectors -> 4 Growns -> 2 Mighties -> Helm
+- Quantisimos, maturity, PocketBook continuity
+- Parse / reparse / relational families / Shortn / reverse materialisation
+- Independent .qt terrain and portable .book continuity
+- Cognition-time provenance: line:store:rrN:uN
+- LCD dynamic thesauric distance (+- relation; rendered +\u00b1+)
+- OCD opposing common denominator (+!= relation; rendered +\u2260+)
+- Municipality governed relation structure
+- QUALIA-style recall, depth, reconsolidation, attention and links
+- Surface / Workspace / Resident / Tools / Events / optional Provider boundary
+
+Quant is deliberately small. Understanding is carried primarily in relations,
+provenance and selective continuity rather than large learned weights.
+"""
+from __future__ import annotations
+
+import argparse
+import hashlib
+import html
+import inspect
+import json
+import math
+import os
+import re
+import time
+import urllib.error
+import urllib.request
+import uuid
+import zipfile
+from collections import defaultdict, deque
+from dataclasses import asdict, dataclass, field
+from pathlib import Path
+from typing import Any, Callable, Iterable, Optional
+
+LCD_OPERATOR = "+\u00b1+"
+OCD_OPERATOR = "+\u2260+"
+WORD_RE = re.compile(r"[A-Za-z0-9_'-]{2,}")
+SENTENCE_RE = re.compile(r"(?<=[.!?])\s+")
+STOP = {
+    "a","an","the","and","or","but","if","then","than","to","of","in","on","at","for","from",
+    "with","without","by","as","is","are","was","were","be","been","being","it","this","that",
+    "these","those","i","you","he","she","they","we","me","my","your","our","their","his","her"
+}
+
+
+def words(text: str) -> set[str]:
+    return {w.lower() for w in WORD_RE.findall(str(text)) if w.lower() not in STOP}
+
+
+def stable_id(*parts: Any, size: int = 12) -> str:
+    raw = "|".join(str(p) for p in parts)
+    return hashlib.sha256(raw.encode("utf-8", "replace")).hexdigest()[:size]
+
+
+def sha256_text(text: str) -> str:
+    return hashlib.sha256(text.encode("utf-8", "replace")).hexdigest()
+
+
+def jaccard(a: Iterable[str], b: Iterable[str]) -> float:
+    aa, bb = set(a), set(b)
+    if not aa and not bb:
+        return 1.0
+    if not aa or not bb:
+        return 0.0
+    return len(aa & bb) / len(aa | bb)
+
+
+def clamp(v: float, lo: float = 0.0, hi: float = 1.0) -> float:
+    return max(lo, min(hi, v))
+
+
+@dataclass(slots=True)
+class Provenance:
+    line: int
+    store: str = "null"  # .book | .qt | null
+    reread: int = 0
+    used: int = 0
+
+    def stamp(self) -> str:
+        return f"{self.line}:{self.store}:rr{self.reread}:u{self.used}"
+
+    @classmethod
+    def parse(cls, value: str) -> "Provenance":
+        m = re.fullmatch(r"(\d+):(\.book|\.qt|null):rr(\d+):u(\d+)", value.strip())
+        if not m:
+            raise ValueError(f"Invalid Quant provenance: {value}")
+        return cls(int(m.group(1)), m.group(2), int(m.group(3)), int(m.group(4)))
+
+
+@dataclass(slots=True)
+class Triple:
+    subject: str
+    relation: str
+    object: str
+    confidence: float = 0.6
+    source: str = ""
+    provenance: Provenance | None = None
+    record_id: str = ""
+
+    def __post_init__(self) -> None:
+        if not self.record_id:
+            self.record_id = stable_id(self.subject, self.relation, self.object, self.source, self.provenance.line if self.provenance else 0)
+
+    def key(self) -> tuple[str, str, str]:
+        return (self.subject.lower().strip(), self.relation.lower().strip(), self.object.lower().strip())
+
+    def terms(self) -> set[str]:
+        return words(f"{self.subject} {self.relation} {self.object}")
+
+    def text(self) -> str:
+        return f"{self.subject} | {self.relation} | {self.object}"
+
+
+@dataclass(slots=True)
+class MemoryRecord:
+    triple: Triple
+    text: str
+    store: str
+    created_line: int
+    user_taught: bool = False
+    heat: float = 0.35
+    importance: float = 0.5
+    last_line: int = 0
+    contradiction_ids: list[str] = field(default_factory=list)
+
+    @property
+    def provenance(self) -> Provenance:
+        if self.triple.provenance is None:
+            self.triple.provenance = Provenance(self.created_line, self.store)
+        return self.triple.provenance
+
+
+@dataclass(slots=True)
+class QuantEvent:
+    kind: str
+    detail: dict[str, Any] = field(default_factory=dict)
+    at_line: int = 0
+
+
+@dataclass(slots=True)
+class Reply:
+    text: str
+    events: list[QuantEvent]
+    evidence: list[MemoryRecord]
+    mode: str = "quant"
+    provider: str = "resident"
+
+
+class CognitionClock:
+    """Quant's own active continuum. One tick is one meaningful parsed unit."""
+    def __init__(self, line: int = 0) -> None:
+        self.line = int(line)
+
+    def tick(self, amount: int = 1) -> int:
+        self.line += max(1, int(amount))
+        return self.line
+
+
+class Shortn:
+    """Bounded surface family map. Unknown forms remain themselves until evidence validates a family."""
+    def __init__(self) -> None:
+        self.surface_to_canon: dict[str, str] = {}
+        self.canon_to_surface: dict[str, dict[str, int]] = defaultdict(lambda: defaultdict(int))
+
+    def observe(self, surface: str, canonical: str, weight: int = 1) -> None:
+        s, c = surface.lower().strip(), canonical.lower().strip()
+        if not s or not c:
+            return
+        previous = self.surface_to_canon.get(s)
+        if previous is None or previous == c:
+            self.surface_to_canon[s] = c
+            self.canon_to_surface[c][s] += max(1, weight)
+
+    def canonical(self, surface: str) -> str:
+        return self.surface_to_canon.get(surface.lower().strip(), surface.lower().strip())
+
+    def reverse(self, canonical: str) -> str:
+        c = canonical.lower().strip()
+        options = self.canon_to_surface.get(c)
+        if not options:
+            return canonical
+        return max(options.items(), key=lambda kv: (kv[1], -len(kv[0])))[0]
+
+    def roundtrip(self, surface: str) -> bool:
+        return self.canonical(self.reverse(self.canonical(surface))) == self.canonical(surface)
+
+
+class LexicalRelations:
+    """Private Quant thesauric geometry: dynamic LCD distance and OCD opposition."""
+    def __init__(self) -> None:
+        self.syn: dict[str, dict[str, int]] = defaultdict(dict)
+        self.ant: dict[str, set[str]] = defaultdict(set)
+        self._seed()
+
+    def _link_syn(self, a: str, b: str, cost: int = 1) -> None:
+        a, b = a.lower(), b.lower()
+        cost = max(0, min(8, int(cost)))
+        self.syn[a][b] = min(cost, self.syn[a].get(b, 99))
+        self.syn[b][a] = min(cost, self.syn[b].get(a, 99))
+
+    def _link_ant(self, a: str, b: str) -> None:
+        a, b = a.lower(), b.lower()
+        self.ant[a].add(b)
+        self.ant[b].add(a)
+
+    def _seed(self) -> None:
+        syn_groups = [
+            ("dog", "canine", 1), ("dogs", "canines", 1), ("kind", "gentle", 2), ("gentle", "caring", 2),
+            ("caring", "loyal", 2), ("loyal", "faithful", 1), ("are", "seem", 3), ("seem", "appear", 1),
+            ("appear", "present", 2), ("present", "present as", 1), ("requires", "needs", 1),
+            ("needs", "depends", 2), ("before", "precedes", 1), ("after", "follows", 1),
+            ("use", "apply", 2), ("help", "assist", 1), ("change", "revise", 2), ("remember", "retain", 2),
+        ]
+        for a, b, c in syn_groups:
+            self._link_syn(a, b, c)
+        for a, b in [
+            ("hot","cold"), ("accept","reject"), ("increase","decrease"), ("love","hate"),
+            ("kind","cruel"), ("before","after"), ("allow","deny"), ("true","false"),
+            ("open","close"), ("present","absent"), ("same","different")
+        ]:
+            self._link_ant(a, b)
+
+    def observe_synonym(self, a: str, b: str, cost: int = 1) -> None:
+        self._link_syn(a, b, cost)
+
+    def observe_antonym(self, a: str, b: str) -> None:
+        self._link_ant(a, b)
+
+    def lcd_distance(self, a: str, b: str, limit: int = 9) -> tuple[int, str | None, list[str]]:
+        """Return bounded thesauric jump cost, dynamic meeting point, and path. 9 means no bounded path."""
+        a, b = a.lower().strip(), b.lower().strip()
+        if a == b:
+            return 0, a, [a]
+        # Weighted Dijkstra over tiny synonym graph.
+        frontier: list[tuple[int, str, list[str]]] = [(0, a, [a])]
+        seen: dict[str, int] = {a: 0}
+        while frontier:
+            frontier.sort(key=lambda row: row[0])
+            cost, node, path = frontier.pop(0)
+            if cost >= limit:
+                continue
+            for nxt, edge in self.syn.get(node, {}).items():
+                nc = cost + edge
+                if nc >= limit or nc >= seen.get(nxt, 99):
+                    continue
+                np = path + [nxt]
+                if nxt == b:
+                    # Meeting point is dynamic: middle junction of actual path.
+                    return nc, np[len(np)//2], np
+                seen[nxt] = nc
+                frontier.append((nc, nxt, np))
+        return 9, None, []
+
+    def ocd(self, a: str, b: str) -> bool:
+        a, b = a.lower().strip(), b.lower().strip()
+        if b in self.ant.get(a, set()):
+            return True
+        # Near-antonym through one synonym hop on either side.
+        a_near = {a} | set(self.syn.get(a, {}))
+        b_near = {b} | set(self.syn.get(b, {}))
+        return any(y in self.ant.get(x, set()) for x in a_near for y in b_near)
+
+    def compare_triples(self, a: Triple, b: Triple) -> dict[str, Any]:
+        left = [a.subject, a.relation, a.object]
+        right = [b.subject, b.relation, b.object]
+        distances = []
+        lcds = []
+        oppositions = []
+        for x, y in zip(left, right):
+            d, lcd, path = self.lcd_distance(x, y)
+            distances.append(d)
+            lcds.append({"lcd": lcd, "path": path})
+            oppositions.append(self.ocd(x, y))
+        if any(oppositions):
+            relation = OCD_OPERATOR
+        elif all(d < 9 for d in distances):
+            relation = LCD_OPERATOR
+        else:
+            relation = None
+        return {"operator": relation, "distance": distances, "lcd": lcds, "opposition": oppositions}
+
+
+class Grammar:
+    """Small deterministic parser and reverse materialiser."""
+    VERBISH = {
+        "is","are","was","were","be","becomes","became","has","have","had","uses","use","used","needs",
+        "need","requires","require","opens","open","closes","close","allows","allow","denies","deny",
+        "means","mean","likes","like","prefers","prefer","wants","want","adds","add","removes","remove",
+        "stores","store","retrieves","retrieve","reads","read","writes","write","changes","change",
+        "supports","support","contains","contain","keeps","keep","travels","travel","learns","learn",
+        "helps","help","follows","follow","precedes","precede","avoids","avoid","crosses","cross"
+    }
+
+    def __init__(self, shortn: Shortn) -> None:
+        self.shortn = shortn
+
+    def parse(self, text: str, source: str, clock: CognitionClock) -> list[Triple]:
+        out: list[Triple] = []
+        for sentence in [s.strip() for s in SENTENCE_RE.split(" ".join(str(text).split())) if s.strip()]:
+            toks = WORD_RE.findall(sentence)
+            if len(toks) < 2:
+                continue
+            lower = [t.lower() for t in toks]
+            vi = next((i for i, t in enumerate(lower) if t in self.VERBISH and i > 0), None)
+            if vi is None:
+                vi = 1 if len(toks) >= 3 else 0
+            if vi <= 0:
+                subj = toks[0]
+                rel = toks[1] if len(toks) > 1 else "relates"
+                obj = " ".join(toks[2:]) if len(toks) > 2 else ""
+            else:
+                subj = " ".join(toks[:vi])
+                # Keep small phrasal relation where useful.
+                rel_parts = [toks[vi]]
+                if vi + 1 < len(toks) and lower[vi+1] in {"as","to","from","with","before","after","in","on"}:
+                    rel_parts.append(toks[vi+1])
+                    obj_start = vi + 2
+                else:
+                    obj_start = vi + 1
+                rel = " ".join(rel_parts)
+                obj = " ".join(toks[obj_start:])
+            if not obj:
+                obj = "present"
+            line = clock.tick()
+            out.append(Triple(subj, self.shortn.canonical(rel), obj, confidence=0.62, source=source,
+                              provenance=Provenance(line, "null")))
+        return out
+
+    def materialise(self, triples: list[Triple], limit: int = 4) -> str:
+        sentences: list[str] = []
+        seen: set[tuple[str,str,str]] = set()
+        for t in triples:
+            if t.key() in seen:
+                continue
+            seen.add(t.key())
+            s = t.subject.strip()
+            r = self.shortn.reverse(t.relation).strip()
+            o = t.object.strip()
+            if not s or not r or not o:
+                continue
+            # Conservative surface. Do not invent missing facts.
+            sentence = f"{s} {r} {o}".strip()
+            sentence = sentence[0].upper() + sentence[1:] if sentence else sentence
+            if sentence[-1:] not in ".!?":
+                sentence += "."
+            sentences.append(sentence)
+            if len(sentences) >= limit:
+                break
+        return " ".join(sentences)
+
+
+class MemoryStore:
+    def __init__(self, name: str, capacity: int) -> None:
+        self.name = name
+        self.capacity = capacity
+        self.records: dict[str, MemoryRecord] = {}
+
+    def add(self, record: MemoryRecord) -> str:
+        record.store = self.name
+        record.provenance.store = self.name
+        existing = self.records.get(record.triple.record_id)
+        if existing is not None:
+            existing.provenance.reread += 1
+            existing.importance = max(existing.importance, record.importance)
+            existing.user_taught = existing.user_taught or record.user_taught
+            existing.heat = min(1.0, max(existing.heat, record.heat) + 0.01)
+            return existing.triple.record_id
+        self.records[record.triple.record_id] = record
+        self._cap()
+        return record.triple.record_id
+
+    def _cap(self) -> None:
+        if len(self.records) <= self.capacity:
+            return
+        ranked = sorted(self.records.values(), key=lambda r: (
+            r.user_taught,
+            r.provenance.used,
+            r.importance,
+            r.provenance.reread,
+            r.created_line,
+        ))
+        for rec in ranked[:len(self.records)-self.capacity]:
+            self.records.pop(rec.triple.record_id, None)
+
+    def search(self, query: str, *, limit: int = 12, current_line: int = 0) -> list[tuple[MemoryRecord,float]]:
+        q = words(query)
+        if not q:
+            return []
+        hits: list[tuple[MemoryRecord,float]] = []
+        for rec in self.records.values():
+            tw = rec.triple.terms()
+            overlap = len(q & tw)
+            if overlap == 0:
+                continue  # relevance creates candidacy; heat never does.
+            coverage = overlap / max(1, len(q))
+            density = overlap / max(1, len(tw))
+            age = max(0, current_line - rec.provenance.line)
+            recency = 1 / (1 + math.log1p(age))
+            use = min(1.0, rec.provenance.used / max(1, rec.provenance.reread or 1))
+            score = coverage*0.58 + min(density*2,0.18) + rec.heat*0.06 + rec.importance*0.05 + use*0.08 + recency*0.05
+            hits.append((rec, score))
+        hits.sort(key=lambda x: (x[1], x[0].provenance.line), reverse=True)
+        return hits[:limit]
+
+    def export_text(self) -> str:
+        payload = {
+            "kind": self.name,
+            "records": [self._record_to_dict(r) for r in self.records.values()],
+        }
+        body = json.dumps(payload, ensure_ascii=False, separators=(",",":"), sort_keys=True)
+        return body + "\n# QUANT_SHA256:" + sha256_text(body) + "\n"
+
+    def import_text(self, text: str) -> int:
+        body, sep, marker = text.rpartition("\n# QUANT_SHA256:")
+        if not sep or sha256_text(body) != marker.strip():
+            raise ValueError(f"{self.name} integrity mismatch")
+        payload = json.loads(body)
+        if payload.get("kind") != self.name:
+            raise ValueError(f"Expected {self.name}, got {payload.get('kind')}")
+        self.records.clear()
+        for row in payload.get("records", []):
+            rec = self._record_from_dict(row)
+            self.records[rec.triple.record_id] = rec
+        self._cap()
+        return len(self.records)
+
+    @staticmethod
+    def _record_to_dict(rec: MemoryRecord) -> dict[str, Any]:
+        t = asdict(rec.triple)
+        return {
+            "triple": t,
+            "text": rec.text,
+            "store": rec.store,
+            "created_line": rec.created_line,
+            "user_taught": rec.user_taught,
+            "heat": rec.heat,
+            "importance": rec.importance,
+            "last_line": rec.last_line,
+            "contradiction_ids": list(rec.contradiction_ids),
+        }
+
+    @staticmethod
+    def _record_from_dict(row: dict[str, Any]) -> MemoryRecord:
+        td = dict(row["triple"])
+        pd = td.get("provenance")
+        td["provenance"] = Provenance(**pd) if pd else None
+        return MemoryRecord(triple=Triple(**td), text=row.get("text", ""), store=row.get("store", "null"),
+                            created_line=int(row.get("created_line", 0)), user_taught=bool(row.get("user_taught", False)),
+                            heat=float(row.get("heat", .35)), importance=float(row.get("importance", .5)),
+                            last_line=int(row.get("last_line", 0)), contradiction_ids=list(row.get("contradiction_ids", [])))
+
+
+@dataclass(slots=True)
+class QualiaAtom:
+    record_id: str
+    novelty: float = 1.0
+    valence: float = 0.0
+    depth: float = 0.0
+    attention: float = 0.0
+    reconsolidations: int = 0
+    links: dict[str, float] = field(default_factory=dict)
+    context_words: set[str] = field(default_factory=set)
+
+    def touch(self, context: set[str]) -> None:
+        self.reconsolidations += 1
+        self.novelty = max(0.05, self.novelty * 0.85)
+        self.depth = min(1.0, self.depth + 0.08)
+        self.context_words |= set(list(context - STOP)[:12])
+
+
+class QualiaField:
+    def __init__(self) -> None:
+        self.atoms: dict[str, QualiaAtom] = {}
+
+    def ensure(self, record_id: str) -> QualiaAtom:
+        if record_id not in self.atoms:
+            self.atoms[record_id] = QualiaAtom(record_id)
+        return self.atoms[record_id]
+
+    def recall(self, ranked: list[tuple[MemoryRecord,float]], context: set[str]) -> None:
+        for rec, score in ranked:
+            atom = self.ensure(rec.triple.record_id)
+            atom.touch(context)
+            atom.attention = clamp(score)
+            atom.valence = clamp(atom.valence + score*0.08, -1, 1)
+        ids = [r.triple.record_id for r, s in ranked if s > 0.18][:8]
+        for i, a in enumerate(ids):
+            for b in ids[i+1:]:
+                aa, bb = self.ensure(a), self.ensure(b)
+                aa.links[b] = min(1.0, aa.links.get(b, 0.0) + 0.12)
+                bb.links[a] = min(1.0, bb.links.get(a, 0.0) + 0.12)
+
+    def decay(self) -> None:
+        for atom in self.atoms.values():
+            atom.attention *= 0.5
+            atom.valence *= 0.98
+
+
+@dataclass(slots=True)
+class MunicipalEdge:
+    source: str
+    target: str
+    relation: str
+    weight: float
+    epoch: int
+
+
+class Municipality:
+    """Small governed relation substrate distilled into a single-file engine."""
+    def __init__(self) -> None:
+        self.epoch = 0
+        self.citizens: set[str] = set()
+        self.edges: list[MunicipalEdge] = []
+        self.gaps: set[str] = set()
+        self.decisions: list[dict[str, Any]] = []
+
+    def admit(self, rec: MemoryRecord) -> bool:
+        self.epoch += 1
+        rid = rec.triple.record_id
+        if rid in self.citizens:
+            return True
+        # Admission is evidence-governed and bounded.
+        approval = clamp(0.35 + rec.importance*0.30 + min(rec.provenance.reread, 8)*0.025 + min(rec.provenance.used, 8)*0.025)
+        accepted = approval > 0.50 or rec.user_taught
+        self.decisions.append({"epoch": self.epoch, "record": rid, "approval": round(approval,3), "accepted": accepted})
+        if accepted:
+            self.citizens.add(rid)
+            self.gaps.discard(rid)
+        return accepted
+
+    def connect(self, a: MemoryRecord, b: MemoryRecord, relation: str, weight: float) -> None:
+        if a.triple.record_id == b.triple.record_id:
+            return
+        key = {a.triple.record_id, b.triple.record_id}
+        for e in self.edges:
+            if {e.source, e.target} == key and e.relation == relation:
+                e.weight = max(e.weight, weight)
+                return
+        self.edges.append(MunicipalEdge(a.triple.record_id, b.triple.record_id, relation, clamp(weight), self.epoch))
+
+    def form_semantic_edges(self, records: list[MemoryRecord], lexical: LexicalRelations) -> None:
+        for i, a in enumerate(records[:20]):
+            for b in records[i+1:20]:
+                sim = jaccard(a.triple.terms(), b.triple.terms())
+                cmp = lexical.compare_triples(a.triple, b.triple)
+                if cmp["operator"] == OCD_OPERATOR:
+                    self.connect(a, b, "opposing_common_denominator", max(0.5, sim))
+                elif cmp["operator"] == LCD_OPERATOR:
+                    proximity = 1 - (sum(cmp["distance"])/27)
+                    self.connect(a, b, "lowest_common_denominator", max(sim, proximity))
+                elif sim >= 0.22:
+                    self.connect(a, b, "semantic_resonance", sim)
+
+
+class Quantisimos:
+    NAMES = [
+        "WarmCare","CuriousWonder","PlayfulLight","PreciseClean",
+        "GentleMelancholy","QuietConfidence","SoftAmusement","ReflectiveDeep",
+        "Grown_0","Grown_1","Grown_2","Grown_3","Mighty_0","Mighty_1","Helm"
+    ]
+    def __init__(self, per_name: int = 56) -> None:
+        self.per_name = per_name
+        self.fragments: dict[str,list[dict[str,Any]]] = {n: [] for n in self.NAMES}
+
+    def add(self, name: str, text: str, line: int, marker: str = "") -> None:
+        if name not in self.fragments or not text.strip():
+            return
+        self.fragments[name].append({"text": text[:500], "line": line, "marker": marker})
+        self.fragments[name] = self.fragments[name][-self.per_name:]
+
+
+class InnerShape:
+    EMOTIONS = [
+        "WarmCare","CuriousWonder","PlayfulLight","PreciseClean",
+        "GentleMelancholy","QuietConfidence","SoftAmusement","ReflectiveDeep"
+    ]
+
+    def __init__(self, quantisimos: Quantisimos) -> None:
+        self.quantisimos = quantisimos
+
+    def perspectives(self, query: str, evidence: list[MemoryRecord]) -> list[dict[str,Any]]:
+        q = words(query)
+        contradiction = any(r.contradiction_ids for r in evidence)
+        scores = {
+            "WarmCare": 0.45 + (0.2 if any(x in query.lower() for x in ("help","please","worried","need")) else 0),
+            "CuriousWonder": 0.45 + (0.2 if "?" in query or any(x in query.lower() for x in ("why","how","what")) else 0),
+            "PlayfulLight": 0.30,
+            "PreciseClean": 0.55 + (0.25 if contradiction or len(evidence) > 2 else 0),
+            "GentleMelancholy": 0.20,
+            "QuietConfidence": 0.50 + (0.15 if evidence else -0.25),
+            "SoftAmusement": 0.20,
+            "ReflectiveDeep": 0.50 + min(0.25, len(evidence)*0.04),
+        }
+        result = []
+        for name in self.EMOTIONS:
+            result.append({"name": name, "weight": clamp(scores[name]), "focus": self._focus(name, q, evidence)})
+        return result
+
+    def _focus(self, name: str, q: set[str], evidence: list[MemoryRecord]) -> str:
+        if not evidence:
+            return "insufficient placed context"
+        top = evidence[0].triple
+        if name == "PreciseClean":
+            return f"preserve {top.subject} / {top.relation} / {top.object} exactly"
+        if name == "CuriousWonder":
+            return "notice neighbouring relations and unresolved gaps"
+        if name == "WarmCare":
+            return "make the useful action easy to understand"
+        if name == "QuietConfidence":
+            return "state only what the evidence can carry"
+        if name == "ReflectiveDeep":
+            return "preserve relation history and context"
+        if name == "PlayfulLight":
+            return "allow light language only if clarity survives"
+        if name == "GentleMelancholy":
+            return "notice loss, revision and what no longer holds"
+        return "keep the prose human-sized"
+
+    def converge(self, query: str, evidence: list[MemoryRecord], base_text: str, line: int) -> dict[str,Any]:
+        eight = self.perspectives(query, evidence)
+        for p in eight:
+            self.quantisimos.add(p["name"], p["focus"], line, "*1/8")
+        four = []
+        for i in range(4):
+            pair = eight[i*2:(i+1)*2]
+            winner = max(pair, key=lambda x: x["weight"])
+            four.append({"name": f"Grown_{i}", "weight": sum(x["weight"] for x in pair)/2, "focus": winner["focus"]})
+            self.quantisimos.add(f"Grown_{i}", winner["focus"], line, "*1/4")
+        two = []
+        for i in range(2):
+            pair = four[i*2:(i+1)*2]
+            winner = max(pair, key=lambda x: x["weight"])
+            two.append({"name": f"Mighty_{i}", "weight": sum(x["weight"] for x in pair)/2, "focus": winner["focus"]})
+            self.quantisimos.add(f"Mighty_{i}", winner["focus"], line, "*1/2")
+        helm_focus = max(two, key=lambda x: x["weight"])["focus"] if two else "clarity"
+        self.quantisimos.add("Helm", helm_focus, line, "*H")
+        return {"eight": eight, "four": four, "two": two, "helm": helm_focus, "text": base_text}
+
+
+@dataclass(slots=True)
+class Tool:
+    name: str
+    description: str
+    fn: Callable[..., Any]
+
+    def schema(self) -> dict[str,Any]:
+        sig = inspect.signature(self.fn)
+        return {"name": self.name, "description": self.description,
+                "parameters": [n for n in sig.parameters]}
+
+
+class ToolRegistry:
+    def __init__(self) -> None:
+        self._tools: dict[str,Tool] = {}
+
+    def register(self, name: str, fn: Callable[...,Any], description: str = "") -> None:
+        if not name.replace("_", "").isalnum():
+            raise ValueError("Tool names must contain only letters, numbers and underscores")
+        self._tools[name] = Tool(name, description or (fn.__doc__ or "").strip(), fn)
+
+    def invoke(self, name: str, **kwargs: Any) -> Any:
+        if name not in self._tools:
+            raise KeyError(name)
+        return self._tools[name].fn(**kwargs)
+
+    def schemas(self) -> list[dict[str,Any]]:
+        return [t.schema() for t in self._tools.values()]
+
+
+class Provider:
+    """Optional OpenAI-compatible provider boundary. Never selected implicitly."""
+    def __init__(self, base_url: str, model: str, api_key: str | None = None, timeout: float = 120.0) -> None:
+        self.base_url, self.model, self.api_key, self.timeout = base_url.rstrip("/"), model, api_key, timeout
+        self.name = "openai-compatible"
+
+    def complete(self, messages: list[dict[str,str]], temperature: float = 0.2) -> str:
+        body = json.dumps({"model": self.model, "messages": messages, "temperature": temperature, "stream": False}).encode()
+        headers = {"Content-Type":"application/json","Accept":"application/json"}
+        if self.api_key:
+            headers["Authorization"] = f"Bearer {self.api_key}"
+        req = urllib.request.Request(self.base_url + "/chat/completions", data=body, headers=headers, method="POST")
+        try:
+            with urllib.request.urlopen(req, timeout=self.timeout) as res:
+                payload = json.loads(res.read().decode("utf-8"))
+            return str(payload["choices"][0]["message"]["content"])
+        except (urllib.error.URLError, KeyError, IndexError, TypeError) as exc:
+            raise RuntimeError(f"Provider failure: {exc}") from exc
+
+
+class Workspace:
+    """File/context boundary. Raw workspace is not Quant's identity."""
+    SUPPORTED = {".txt",".md",".py",".js",".ts",".tsx",".jsx",".css",".log",".yaml",".yml",".toml",".ini",".html",".htm",".xml",".json",".csv",".docx"}
+    def __init__(self) -> None:
+        self.documents: list[tuple[str,str]] = []
+
+    def ingest_text(self, text: str, source: str = "workspace") -> None:
+        if text.strip():
+            self.documents.append((source, text))
+
+    def ingest_path(self, path: str | Path) -> None:
+        p = Path(path)
+        ext = p.suffix.lower()
+        if ext not in self.SUPPORTED:
+            raise ValueError(f"Unsupported workspace file: {p.name}")
+        if ext == ".docx":
+            with zipfile.ZipFile(p) as z:
+                xml = z.read("word/document.xml").decode("utf-8", "replace")
+            text = re.sub(r"<[^>]+>", " ", xml)
+        elif ext in {".html",".htm",".xml"}:
+            text = html.unescape(re.sub(r"<[^>]+>", " ", p.read_text(encoding="utf-8", errors="replace")))
+        else:
+            text = p.read_text(encoding="utf-8", errors="replace")
+        self.ingest_text(text, p.name)
+
+    def ingest_directory(self, path: str | Path, recursive: bool = True) -> int:
+        root = Path(path)
+        paths = root.rglob("*") if recursive else root.glob("*")
+        n = 0
+        for p in sorted(paths):
+            if p.is_file() and p.suffix.lower() in self.SUPPORTED:
+                try:
+                    self.ingest_path(p); n += 1
+                except Exception:
+                    pass
+        return n
+
+
+class Quant:
+    """Fully realised canonical Quant."""
+    def __init__(self, *, provider: Provider | None = None) -> None:
+        self.clock = CognitionClock()
+        self.shortn = Shortn()
+        self.lexical = LexicalRelations()
+        self.grammar = Grammar(self.shortn)
+        self.book = MemoryStore(".book", 3200)
+        self.qt = MemoryStore(".qt", 24000)
+        self.qualia = QualiaField()
+        self.municipality = Municipality()
+        self.quantisimos = Quantisimos(56)
+        self.inner = InnerShape(self.quantisimos)
+        self.workspace = Workspace()
+        self.tools = ToolRegistry()
+        self.provider = provider
+        self.maturity = 1
+        self.events: list[QuantEvent] = []
+        self.active_qt_name = "default.qt"
+        self.history: list[tuple[str,str]] = []
+
+    def event(self, kind: str, **detail: Any) -> None:
+        self.events.append(QuantEvent(kind, detail, self.clock.line))
+
+    # ---------- teaching / ingestion ----------
+    def ingest(self, text: str, *, source: str = "context", store: str = ".qt", user_taught: bool = False) -> list[MemoryRecord]:
+        triples = self.grammar.parse(text, source, self.clock)
+        records: list[MemoryRecord] = []
+        for t in triples:
+            importance = self._importance(t, text, user_taught)
+            target = store if store in {".qt",".book"} else self._retention_decision(t, importance)
+            t.provenance.store = target
+            rec = MemoryRecord(t, text[:1600], target, t.provenance.line, user_taught=user_taught,
+                               heat=0.65 if user_taught else 0.35, importance=importance, last_line=self.clock.line)
+            self._notice_relations(rec)
+            if target == ".book":
+                self.book.add(rec)
+            elif target == ".qt":
+                self.qt.add(rec)
+            self.qualia.ensure(rec.triple.record_id)
+            self.municipality.admit(rec)
+            records.append(rec)
+        if records:
+            self.municipality.form_semantic_edges(records + list(self.book.records.values())[-8:] + list(self.qt.records.values())[-8:], self.lexical)
+        self._mature(len(records))
+        self.event("context.ingested", source=source, records=len(records), store=store)
+        return records
+
+    def teach(self, text: str, *, portable: bool = True, source: str = "user") -> list[MemoryRecord]:
+        return self.ingest(text, source=source, store=".book" if portable else ".qt", user_taught=True)
+
+    def _importance(self, t: Triple, text: str, user_taught: bool) -> float:
+        score = 0.40 + (0.25 if user_taught else 0)
+        low = text.lower()
+        if any(x in low for x in ("important","always","never","means","definition","must","prefer","remember")):
+            score += 0.18
+        if len(t.terms()) >= 4:
+            score += 0.05
+        return clamp(score)
+
+    def _retention_decision(self, t: Triple, importance: float) -> str:
+        if importance >= 0.72:
+            return ".book"
+        if importance >= 0.38:
+            return ".qt"
+        return "null"
+
+    def _notice_relations(self, rec: MemoryRecord) -> None:
+        # Compare against recent/related state without forcing resolution.
+        pool = list(self.book.records.values()) + list(self.qt.records.values())
+        for other in pool[-400:]:
+            if other.triple.record_id == rec.triple.record_id:
+                continue
+            overlap = jaccard(rec.triple.terms(), other.triple.terms())
+            if overlap < 0.15:
+                continue
+            cmp = self.lexical.compare_triples(rec.triple, other.triple)
+            op = cmp["operator"]
+            if op == OCD_OPERATOR:
+                rec.contradiction_ids.append(other.triple.record_id)
+                other.contradiction_ids.append(rec.triple.record_id)
+            if op:
+                self.event("relation.noticed", operator=op, left=other.triple.record_id, right=rec.triple.record_id, distance=cmp["distance"])
+
+    # ---------- retrieval / reparse ----------
+    def retrieve(self, query: str, limit: int = 12) -> list[tuple[MemoryRecord,float]]:
+        hot = self.book.search(query, limit=limit, current_line=self.clock.line)
+        cold = self.qt.search(query, limit=limit, current_line=self.clock.line)
+        merged: dict[str, tuple[MemoryRecord,float]] = {}
+        for rec, score in hot + cold:
+            prior = merged.get(rec.triple.record_id)
+            if prior is None or score > prior[1]:
+                merged[rec.triple.record_id] = (rec, score)
+        ranked = sorted(merged.values(), key=lambda x: (x[1], x[0].provenance.line), reverse=True)[:limit]
+        qwords = words(query)
+        for rec, _ in ranked:
+            rec.provenance.reread += 1
+            rec.heat = min(1.0, rec.heat + 0.03)
+            rec.last_line = self.clock.line
+        self.qualia.recall(ranked, qwords)
+        self.event("workspace.retrieved", hits=len(ranked))
+        return ranked
+
+    def reparse(self, query: str, ranked: list[tuple[MemoryRecord,float]]) -> list[tuple[MemoryRecord,float]]:
+        """Second pass uses relational neighbourhood + Quant provenance, not a heavyweight temporal subsystem."""
+        if not ranked:
+            return []
+        q = words(query)
+        rescored: list[tuple[MemoryRecord,float]] = []
+        for rec, base in ranked:
+            score = base
+            t = rec.triple
+            # Query relation proximity via LCD/OCD.
+            for qw in q:
+                for term in t.terms():
+                    d, _, _ = self.lexical.lcd_distance(qw, term)
+                    if d < 9:
+                        score += (9-d) / 180
+                    if self.lexical.ocd(qw, term):
+                        score += 0.04
+            # Provenance gives change/revision context but never blindly makes newer true.
+            if rec.contradiction_ids:
+                score += 0.03
+            use_density = rec.provenance.used / max(1, rec.provenance.reread)
+            score += min(0.06, use_density*0.06)
+            rescored.append((rec, score))
+        rescored.sort(key=lambda x: (x[1], x[0].provenance.line), reverse=True)
+        self.event("context.reparsed", candidates=len(rescored))
+        return rescored
+
+    # ---------- prose ----------
+    def answer(self, query: str, *, use_provider: bool = False, context_limit: int = 12) -> Reply:
+        self.events = []
+        self.event("request.received", query=query[:120])
+        self.history.append(("user", query))
+        # Current turn itself is a parsed event in Quant time, but does not automatically become memory.
+        current = self.grammar.parse(query, "current-turn", self.clock)
+        ranked = self.retrieve(query, context_limit)
+        ranked = self.reparse(query, ranked)
+        evidence = [r for r, _ in ranked]
+        if not evidence:
+            text = "I do not have enough placed context for that yet."
+            self.inner.converge(query, [], text, self.clock.line)
+            self.history.append(("assistant", text))
+            self.event("resident.completed", grounded=False)
+            return Reply(text, list(self.events), [], provider="resident")
+
+        # Select sentence-level evidence by query relevance, not hot-first ordering.
+        chosen = self._select_evidence(query, ranked, limit=4)
+        semantic = [r.triple for r in chosen]
+        base = self.grammar.materialise(semantic, limit=4)
+        convergence = self.inner.converge(query, chosen, base, self.clock.line)
+        text = self._helm_prose(query, chosen, convergence)
+
+        if use_provider:
+            if self.provider is None:
+                raise RuntimeError("No provider attached")
+            messages = [
+                {"role":"system","content":"You are an optional prose surface for Quant. Preserve every supplied fact. Do not add facts."},
+                {"role":"system","content":"Quant semantic spine:\n" + "\n".join(t.text() for t in semantic)},
+                {"role":"user","content":query},
+            ]
+            candidate = self.provider.complete(messages, temperature=0.2)
+            if self._semantic_guard(candidate, semantic):
+                text = candidate
+                provider_name = self.provider.name
+                self.event("provider.completed", provider=provider_name)
+            else:
+                provider_name = "resident"
+                self.event("provider.rejected", reason="semantic-guard")
+        else:
+            provider_name = "resident"
+
+        for rec in chosen:
+            rec.provenance.used += 1
+            rec.heat = min(1.0, rec.heat + 0.05)
+        self.qualia.decay()
+        self._mature(len(chosen))
+        self.history.append(("assistant", text))
+        self.event("resident.completed", grounded=True, used=len(chosen))
+        return Reply(text, list(self.events), chosen, provider=provider_name)
+
+    def _select_evidence(self, query: str, ranked: list[tuple[MemoryRecord,float]], limit: int) -> list[MemoryRecord]:
+        q = words(query)
+        scored = []
+        for rec, score in ranked:
+            overlap = len(q & rec.triple.terms())
+            # If same relational area has newer linked alternatives, keep both nearby for Helm rather than silently discarding history.
+            linked_newer = sum(1 for rid in rec.contradiction_ids if rid in self.book.records or rid in self.qt.records)
+            scored.append((score + overlap*0.08 + linked_newer*0.02, rec))
+        scored.sort(key=lambda x: (x[0], x[1].provenance.line), reverse=True)
+        return [r for _, r in scored[:limit]]
+
+    def _helm_prose(self, query: str, evidence: list[MemoryRecord], convergence: dict[str,Any]) -> str:
+        base = convergence["text"]
+        if not base:
+            return "I do not have enough placed context for that yet."
+        # Old/new merge: Helm may improve ordering and connective prose, never semantic payload.
+        if len(evidence) == 1:
+            return base
+        # Put the highest query overlap first; use light connective only.
+        sentences = [s.strip() for s in SENTENCE_RE.split(base) if s.strip()]
+        if not sentences:
+            return base
+        # If opposition/revision is present, acknowledge coexistence without inventing current truth.
+        if any(r.contradiction_ids for r in evidence) and len(sentences) >= 2:
+            return sentences[0].rstrip(".") + ". " + "Related material differs: " + " ".join(s if s.endswith(".") else s+"." for s in sentences[1:])
+        return " ".join(s if s.endswith((".","!","?")) else s+"." for s in sentences)
+
+    def _semantic_guard(self, candidate: str, semantic: list[Triple]) -> bool:
+        c = words(candidate)
+        required = set()
+        for t in semantic:
+            required |= t.terms()
+        # Loose guard: candidate must preserve a majority of semantic terms.
+        return bool(required) and len(c & required) / len(required) >= 0.55
+
+    def _mature(self, activity: int) -> None:
+        if activity <= 0:
+            return
+        total_use = sum(r.provenance.used for r in self.book.records.values())
+        total_read = sum(r.provenance.reread for r in self.book.records.values())
+        signal = len(self.book.records) + total_use*2 + total_read//3
+        self.maturity = max(self.maturity, min(9, 1 + signal//80))
+
+    # ---------- portable continuity / terrain ----------
+    def export_book(self, path: str | Path) -> None:
+        Path(path).write_text(self.book.export_text(), encoding="utf-8")
+
+    def import_book(self, path: str | Path) -> int:
+        return self.book.import_text(Path(path).read_text(encoding="utf-8"))
+
+    def export_qt(self, path: str | Path) -> None:
+        Path(path).write_text(self.qt.export_text(), encoding="utf-8")
+
+    def import_qt(self, path: str | Path) -> int:
+        # Replaces current terrain. .book remains untouched.
+        self.qt = MemoryStore(".qt", 24000)
+        self.active_qt_name = Path(path).name
+        return self.qt.import_text(Path(path).read_text(encoding="utf-8"))
+
+    def detach_qt(self) -> None:
+        self.qt = MemoryStore(".qt", 24000)
+        self.active_qt_name = "default.qt"
+        self.event("terrain.detached")
+
+    def state(self) -> dict[str,Any]:
+        return {
+            "name":"Quant",
+            "line":self.clock.line,
+            "maturity":self.maturity,
+            "book":len(self.book.records),
+            "qt":len(self.qt.records),
+            "active_qt":self.active_qt_name,
+            "qualia_atoms":len(self.qualia.atoms),
+            "municipal_citizens":len(self.municipality.citizens),
+            "municipal_edges":len(self.municipality.edges),
+            "lcd_operator":LCD_OPERATOR,
+            "ocd_operator":OCD_OPERATOR,
+            "provider":self.provider.name if self.provider else None,
+            "tools":len(self.tools.schemas()),
+        }
+
+
+def verify_self(path: str | Path | None = None) -> tuple[bool,str]:
+    p = Path(path or __file__)
+    data = p.read_bytes()
+    marker = b"# QUANT_CANONICAL_SHA256: "
+    pos = data.rfind(marker)
+    if pos < 0:
+        return False, "missing-integrity-marker"
+    body = data[:pos]
+    expected = data[pos:].splitlines()[0].split(b":",1)[1].strip().decode("ascii")
+    actual = hashlib.sha256(body).hexdigest()
+    return actual == expected, actual
+
+
+def smoke_test() -> dict[str,Any]:
+    q = Quant()
+    q.teach("Quant prefers precise language and retains portable understanding.", portable=True)
+    q.ingest("The amber relay opens the north gate before sunrise. The violet seal allows emergency passage.", source="test.qt")
+    a = q.answer("What opens the north gate?")
+    assert "amber" in a.text.lower() and "north" in a.text.lower()
+    # Provenance round-trip.
+    stamp = next(iter(q.book.records.values())).provenance.stamp()
+    assert Provenance.parse(stamp).stamp() == stamp
+    # LCD/OCD basics.
+    d, _, _ = q.lexical.lcd_distance("dog", "canine")
+    assert d < 9
+    assert q.lexical.ocd("hot", "cold")
+    return {"ok":True,"answer":a.text,"state":q.state(),"provenance":stamp,"lcd_dog_canine":d}
+
+
+def main() -> None:
+    ap = argparse.ArgumentParser(description="Quant-as-Quant canonical single-file engine")
+    ap.add_argument("prompt", nargs="*")
+    ap.add_argument("--ingest", action="append", default=[])
+    ap.add_argument("--book")
+    ap.add_argument("--qt")
+    ap.add_argument("--save-book")
+    ap.add_argument("--save-qt")
+    ap.add_argument("--state", action="store_true")
+    ap.add_argument("--self-test", action="store_true")
+    ap.add_argument("--skip-integrity", action="store_true")
+    args = ap.parse_args()
+    if not args.skip_integrity:
+        ok, detail = verify_self()
+        if not ok:
+            raise SystemExit("Quant integrity mismatch: " + detail)
+    if args.self_test:
+        print(json.dumps(smoke_test(), ensure_ascii=False, indent=2)); return
+    q = Quant()
+    if args.book:
+        q.import_book(args.book)
+    if args.qt:
+        q.import_qt(args.qt)
+    for p in args.ingest:
+        text = Path(p).read_text(encoding="utf-8", errors="replace")
+        q.ingest(text, source=Path(p).name, store=".qt")
+    if args.state:
+        print(json.dumps(q.state(), ensure_ascii=False, indent=2))
+    if args.prompt:
+        print(q.answer(" ".join(args.prompt)).text)
+    if args.save_book:
+        q.export_book(args.save_book)
+    if args.save_qt:
+        q.export_qt(args.save_qt)
+
+
+if __name__ == "__main__":
+    main()
+# QUANT_CANONICAL_SHA256: 31d6f6441b8dbaf13af2f50fe88d9d1c3dfb717680d670b97166239578f6f1ef
