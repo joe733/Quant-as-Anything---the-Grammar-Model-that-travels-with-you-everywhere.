@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>CFBundleDisplayName</key>
+	<string>Quant</string>
+	<key>CFBundleExecutable</key>
+	<string>Quant</string>
+	<key>CFBundleIconFile</key>
+	<string>Quant.icns</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.fiducigroup.quant.browser</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>Quant</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>0.3.2</string>
+	<key>CFBundleVersion</key>
+	<string>5</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>14.0</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<false/>
+		<key>NSAllowsLocalNetworking</key>
+		<false/>
+	</dict>
+	<key>NSHighResolutionCapable</key>
+	<true/>
+	<key>NSHumanReadableCopyright</key>
+	<string>© 2026 Joe Smith · Fiduci Group. Quant.</string>
+	<key>NSQuitAlwaysKeepsWindows</key>
+	<false/>
+	<key>QuantCreator</key>
+	<string>Joe Smith</string>
+	<key>QuantPublisher</key>
+	<string>Fiduci Group</string>
+</dict>
+</plist>

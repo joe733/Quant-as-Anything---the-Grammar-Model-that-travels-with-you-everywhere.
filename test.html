@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Compendium Engine</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:hsl(210, 25%, 96%);color:hsl(215, 28%, 14%);font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  body{padding:0 0 6rem}
+  ::selection{background:hsl(215, 28%, 14%);color:hsl(210, 25%, 96%)}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 1.5rem}
+
+  /* masthead */
+  header.mast{border-bottom:1px solid hsla(215, 28%, 14%, 0.40);padding:2.4rem 0 1.4rem;margin-bottom:0}
+  .mast .kicker{font-family:ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;opacity:.62}
+  .mast h1{font-family:'Iowan Old Style', 'Palatino Linotype', 'URW Palladio L', P052, Georgia, serif;font-weight:500;font-size:clamp(2.4rem,5vw,3.6rem);line-height:1.02;margin:.5rem 0 .35rem;letter-spacing:-.01em}
+  .mast .sub{font-family:'Iowan Old Style', 'Palatino Linotype', 'URW Palladio L', P052, Georgia, serif;font-style:italic;font-size:1.18rem;opacity:.8}
+  .mast .stack{font-family:ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;font-size:.7rem;letter-spacing:.12em;opacity:.5;margin-top:.7rem}
+
+  /* honesty banner — load-bearing, not decoration */
+  .truth{border:1px solid hsla(215, 28%, 14%, 0.40);background:hsl(205, 35%, 92%);padding:1rem 1.15rem;margin:1.5rem 0 0;
+    display:grid;grid-template-columns:auto 1fr;gap:.9rem;align-items:start}
+  .truth .mark{font-family:ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;
+    border:1px solid hsl(215, 28%, 14%);padding:.25rem .5rem;white-space:nowrap;align-self:start}
+  .truth p{font-size:.92rem;line-height:1.5}
+  .truth b{font-weight:600}
+
+  /* control desk */
+  .desk{border:1px solid hsla(215, 28%, 14%, 0.40);background:hsl(212, 22%, 90%);margin-top:1.5rem;padding:1.4rem 1.4rem 1.5rem}
+  .desk .row{display:grid;gap:1rem}
+  .field label{display:block;font-family:ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;opacity:.62;margin-bottom:.4rem}
+  .field input[type=text],.field textarea{width:100%;border:none;border-bottom:1px solid hsla(215, 28%, 14%, 0.40);background:transparent;
+    font-family:'Iowan Old Style', 'Palatino Linotype', 'URW Palladio L', P052, Georgia, serif;font-size:1.5rem;padding:.35rem 0 .5rem;color:hsl(215, 28%, 14%);outline:none}
+  .field input[type=text]::placeholder,.field textarea::placeholder{color:hsla(215, 28%, 14%, 0.35);font-style:italic}
+  .field input[type=text]:focus,.field textarea:focus{border-bottom-color:hsl(215, 28%, 14%)}
+  .field textarea{font-size:1.12rem;line-height:1.5;resize:vertical;min-height:10rem}
+  .opts{display:flex;flex-wrap:wrap;gap:1.4rem;align-items:flex-end;margin-top:1.1rem}
+  .seg{display:flex;border:1px solid hsla(215, 28%, 14%, 0.40)}
+  .seg button{font-family:ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;font-size:.74rem;letter-spacing:.06em;background:transparent;border:none;
+    border-right:1px solid hsla(215, 28%, 14%, 0.40);padding:.5rem .8rem;cursor:pointer;color:hsl(215, 28%, 14%);transition:background .25s cubic-bezier(.2,.7,.2,1)}
+  .seg button:last-child{border-right:none}
+  .seg button[aria-pressed=true]{background:hsl(215, 28%, 14%);color:hsl(210, 25%, 96%)}
+  .toolnote{font-family:ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;font-size:.66rem;letter-spacing:.08em;opacity:.5;margin-top:.35rem}
+  .go{margin-left:auto;display:flex;gap:.7rem;align-items:center}
+  button.run{font-family:ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;font-size:.82rem;letter-spacing:.1em;text-transform:uppercase;
+    background:hsl(215, 28%, 14%);color:hsl(210, 25%, 96%);border:1px solid hsl(215, 28%, 14%);padding:.75rem 1.5rem;cursor:pointer;
+    transition:opacity .25s cubic-bezier(.2,.7,.2,1)}
+  button.run:hover{opacity:.82}
+  button.run:disabled{opacity:.4;cursor:default}
+  button.ghost{font-family:ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;font-size:.78rem;letter-spacing:.08em;background:transparent;
+    border:1px solid hsla(215, 28%, 14%, 0.40);padding:.7rem 1.1rem;cursor:pointer;color:hsl(215, 28%, 14%)}
+  button.ghost:hover{border-color:hsl(215, 28%, 14%)}
+
+  /* status line */
+  .status{font-family:ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;font-size:.76rem;letter-spacing:.05em;margin-top:1.5rem;min-height:1.2rem;opacity:.8}
+  .status .dot{display:inline-block;width:7px;height:7px;background:hsl(215, 28%, 14%);margin-right:.5rem;
+    animation:pulse 1s cubic-bezier(.2,.7,.2,1) infinite alternate}
+  @keyframes pulse{from{opacity:.25}to{opacity:1}}
+
+  /* essay output */
+  .essay{border:1px solid hsla(215, 28%, 14%, 0.40);margin-top:1.5rem;background:hsl(210, 25%, 96%)}
+  .essay .head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:.6rem;
+    padding:1.1rem 1.3rem;border-bottom:1px solid hsla(215, 28%, 14%, 0.16)}
+  .essay .head .vol{font-family:ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;opacity:.55}
+  .essay .head h2{font-family:'Iowan Old Style', 'Palatino Linotype', 'URW Palladio L', P052, Georgia, serif;font-weight:500;font-size:1.85rem;line-height:1.05;flex:1 1 100%;letter-spacing:-.01em;margin-top:.2rem}
+  .ret{font-family:ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;font-size:.74rem;letter-spacing:.06em;border:1px solid hsl(215, 28%, 14%);padding:.28rem .6rem;white-space:nowrap}
+  .ret.full{background:hsl(215, 28%, 14%);color:hsl(210, 25%, 96%)}
+  .panes{display:grid;grid-template-columns:1fr 1fr;gap:0}
+  .pane{padding:1.3rem}
+  .pane.src{border-right:1px solid hsla(215, 28%, 14%, 0.16)}
+  .pane .ptag{font-family:ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;opacity:.5;margin-bottom:.7rem}
+  .pane .prose{font-family:'Iowan Old Style', 'Palatino Linotype', 'URW Palladio L', P052, Georgia, serif;font-size:1.18rem;line-height:1.62}
+  .pane.mat .prose{font-weight:500}
+  .pane .prose .retnote{font-family:ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;font-size:.78rem;font-weight:400;opacity:.62;display:block;margin-top:.8rem;line-height:1.5}
+  .audit{padding:.9rem 1.3rem;border-top:1px solid hsla(215, 28%, 14%, 0.16)}
+  .audit summary{font-family:ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;opacity:.6;cursor:pointer}
+  .audit .edits{margin-top:.7rem;font-family:ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;font-size:.74rem;line-height:1.65}
+  .audit .edits .e{padding:.2rem 0;border-bottom:1px dotted hsla(215, 28%, 14%, 0.16)}
+  .audit .edits .k{opacity:.55}
+
+  .empty{border:1px dashed hsla(215, 28%, 14%, 0.40);margin-top:1.5rem;padding:3rem 1.5rem;text-align:center}
+  .empty p{font-family:'Iowan Old Style', 'Palatino Linotype', 'URW Palladio L', P052, Georgia, serif;font-style:italic;font-size:1.25rem;opacity:.6}
+
+  .err{border:1px solid hsl(215, 28%, 14%);background:hsl(205, 35%, 92%);padding:1rem 1.2rem;margin-top:1.5rem;font-size:.92rem}
+  .err b{font-family:ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase}
+
+  footer{border-top:1px solid hsla(215, 28%, 14%, 0.16);margin-top:3rem;padding-top:1.2rem;
+    font-family:ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;font-size:.68rem;letter-spacing:.08em;opacity:.5;display:flex;flex-wrap:wrap;gap:1.2rem;justify-content:space-between}
+
+  @media(max-width:760px){
+    .panes{grid-template-columns:1fr}
+    .pane.src{border-right:none;border-bottom:1px solid hsla(215, 28%, 14%, 0.16)}
+    .go{margin-left:0;width:100%}
+    button.run{flex:1}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="mast">
+    <div class="kicker">Fiduci · Knowledge Compendium</div>
+    <h1>The Compendium Engine</h1>
+    <div class="sub">Any topic, rendered in Truthful Devotion — with the seam left visible.</div>
+    <div class="stack">SOURCE TEXT → MATERIALISE (deterministic) → VERIFY (atom retention)</div>
+  </header>
+
+  <div class="truth">
+    <div class="mark">Read first</div>
+    <p>The materialiser is deterministic and runs locally in this page. It transforms the source text
+    you provide; it does not generate or fact-check it. <b>The retention score measures whether the
+    rendering kept every atom of the source — it does not measure whether the facts are true.</b>
+    A perfect score on a wrong fact is still a wrong fact.</p>
+  </div>
+
+  <div class="desk">
+    <div class="row">
+      <div class="field">
+        <label for="topic">Topic</label>
+        <input type="text" id="topic" placeholder="e.g. How vaccines train the immune system" autocomplete="off">
+      </div>
+      <div class="field">
+        <label for="spine">Source text</label>
+        <textarea id="spine" rows="7" placeholder="Paste the prose to materialise and verify"></textarea>
+      </div>
+    </div>
+    <div class="opts">
+      <div>
+        <label style="font-family:ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;opacity:.62;display:block;margin-bottom:.4rem">Stance</label>
+        <div class="seg" id="stance">
+          <button data-tail="+==T" aria-pressed="true">Direct</button>
+          <button data-tail="+>=T" aria-pressed="false">Confident</button>
+          <button data-tail="+<=T" aria-pressed="false">Uncertain-marked</button>
+          <button data-tail="|==F" aria-pressed="false">Witnessed</button>
+        </div>
+        <div class="toolnote">posture · view · anchor — the engine's <span style="font-family:ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace">--tail</span></div>
+      </div>
+      <div class="go">
+        <button class="ghost" id="dl" disabled>Download .md</button>
+        <button class="run" id="run">Materialise</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="status" id="status"></div>
+  <div id="out">
+    <div class="empty"><p>Enter a topic and source text. The engine will render the text in Truthful Devotion and check which atoms survived.</p></div>
+  </div>
+
+  <footer>
+    <span>Deterministic materialiser · local browser · GB2604968.4</span>
+    <span>Faithful TD port · retention = fidelity, not truth</span>
+  </footer>
+</div>
+
+<script>
+/* ============================================================
+   FAITHFUL TD MATERIALISER — JavaScript port of td_faithful.py
+   Deterministic. No model in this path. The fact spine comes in
+   as `text`; this layer only renders + verifies retention.
+   ============================================================ */
+
+const DEAD_WEIGHT = [
+  [/\bvery\s+/gi,""],[/\bquite\s+/gi,""],[/\breally\s+/gi,""],[/\bbasically\s+/gi,""],
+  [/\bsimply\s+/gi,""],[/\bessentially\s+/gi,""],[/\bactually\s+/gi,""],
+  [/\bin order to\b/gi,"to"],[/\bdue to the fact that\b/gi,"because"],
+  [/\bit is important to note that\s+/gi,""],[/\bit should be noted that\s+/gi,""],
+  [/\bneedless to say,?\s+/gi,""],[/\bas a matter of fact,?\s+/gi,""],
+  [/\bat this point in time\b/gi,"now"],[/\bfor the purpose of\b/gi,"for"],
+  [/\bin the event that\b/gi,"if"],[/\bso as to\b/gi,"to"],
+];
+const HEDGES = [
+  [/\bI think perhaps\s+/gi,""],[/\bit might be worth considering\s+/gi,"consider "],
+  [/\bperhaps\s+/gi,""],[/\bsort of\s+/gi,""],[/\bkind of\s+/gi,""],
+  [/\bmore or less\s+/gi,""],[/\barguably\s+/gi,""],
+];
+const PROTECTED = new Set(["not","no","never","only","zero","single","every","all","each",
+  "must","shall","cannot","self-contained","serverless","open","lightweight","in-memory",
+  "in-process","public","free"]);
+
+const FAM = {"is":["is","are","was","means","defines","constitutes","equals","remains","represents"],
+"has":["has","have","holds","owns","possesses","contains","includes","comprises","carries"],
+"needs":["needs","requires","demands","depends on","rests on","calls for","presupposes","hinges on"],
+"lacks":["lacks","misses","wants for","falls short of","is missing"],
+"makes":["makes","produces","creates","yields","generates","gives","brings","forms","delivers"],
+"enables":["enables","allows","permits","unlocks","affords","facilitates","empowers","supports"],
+"drives":["drives","fuels","powers","propels","accelerates","boosts","amplifies","spurs"],
+"limits":["limits","restricts","constrains","bounds","narrows","checks","caps"],
+"prevents":["prevents","blocks","stops","precludes","forbids","bars","averts"],
+"undermines":["undermines","erodes","weakens","threatens","jeopardises","compromises","damages"],
+"triggers":["triggers","sparks","prompts","induces","precipitates","sets off"],
+"leads-to":["leads to","results in","brings about","points to","ends in","culminates in"],
+"sharpens":["sharpens","refines","hones","clarifies","focuses","tempers","improves"],
+"transforms":["transforms","converts","reshapes","reworks","restructures","reinvents"],
+"sustains":["sustains","maintains","preserves","upholds","secures","protects","safeguards"],
+"mitigates":["mitigates","reduces","lessens","dampens","absorbs","cushions","softens"],
+"counters":["counters","opposes","resists","undoes","works against","contradicts"],
+"becomes":["becomes","turns into","grows into","resolves into","matures into","evolves into"],
+"replaces":["replaces","supersedes","displaces","ousts","substitutes for"],
+"grows":["grows","expands","scales","rises","increases","compounds","widens"],
+"declines":["declines","shrinks","falls","decreases","contracts","wanes","narrows"],
+"implies":["implies","entails","suggests","indicates","signals","shows"],
+"supports":["supports","justifies","backs","corroborates","evidences","substantiates","confirms"],
+"trades-off":["trades off against","balances against","comes at the cost of","weighs against"],
+"exceeds":["exceeds","outperforms","surpasses","beats","outpaces","tops"],
+"equals":["equals","matches","parallels","mirrors","rivals"],
+"costs":["costs","charges","prices","bills"],
+"earns":["earns","returns","nets","profits"],
+"risks":["risks","exposes","imperils","endangers"],
+"complies":["complies with","satisfies","meets","adheres to","conforms to"],
+"breaches":["breaches","violates","breaks","infringes","contravenes"]};
+
+// flatten every surface form -> canonical, for predicate lemma lookup
+const FORM2CANON = {};
+for(const [canon,forms] of Object.entries(FAM)){ for(const f of forms){ FORM2CANON[f]=canon; } }
+
+const STOP = new Set(["the","a","an","of","and","or","is","are","was","were","be","been","being",
+  "to","in","on","at","by","for","with","as","that","this","these","those","it","its","into",
+  "from","than","then","so","such","which","whose","when","where","while","because","but","not",
+  "no","they","their","them","he","she","we","you","i","one","two","three","more","most","each",
+  "many","much","some","any","all","both","other","through","over","under","out","up","down","about"]);
+
+function sentences(text){
+  return text.trim().split(/(?<=[.!?])\s+/).map(s=>s.trim()).filter(Boolean);
+}
+function headNoun(phrase){
+  const toks=(phrase||"").toLowerCase().match(/[a-z][a-z\-']*/g)||[];
+  const keep=toks.filter(t=>!["the","a","an","of","and","or"].includes(t));
+  return keep.length?keep[keep.length-1]:"";
+}
+function stemMatch(lemma,joined){
+  // present allowing inflection: 4-char stem + up to 3 chars, else loose
+  if(FAM[lemma]){
+    return FAM[lemma].some(f=>{
+      const esc=f.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
+      return new RegExp("\\b"+esc).test(joined);
+    });
+  }
+  let stem = (lemma.endsWith("e")&&lemma.length>3)?lemma.slice(0,-1):lemma;
+  const esc=stem.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
+  if(stem.length>=4) return new RegExp("\\b"+esc+"\\w{0,3}\\b").test(joined);
+  return new RegExp("\\b"+esc+"\\w{0,2}\\b").test(joined);
+}
+
+/* lightweight SPO extractor — conservative, mirrors wellie_pro.parse_text
+   intent: per clause, find a verb-ish token; subject = content head before,
+   object = content head after; predicate lemma mapped to a family canon. */
+function extractAtoms(text){
+  const atoms=[];
+  for(const sent of sentences(text)){
+    // split on commas/conjunctions into rough clauses
+    const clauses=sent.replace(/[.!?]+$/,"").split(/,| and | but | which | that | because | so /i);
+    for(let clause of clauses){
+      const words=clause.trim().split(/\s+/).filter(Boolean);
+      if(words.length<3) continue;
+      // find first verb-ish token: a known family form OR a word ending in s/ed/es/ing past stop
+      let vi=-1, lemma=null;
+      for(let i=1;i<words.length-0;i++){
+        const w=words[i].toLowerCase().replace(/[^a-z\-]/g,"");
+        if(!w) continue;
+        if(FORM2CANON[w]){ vi=i; lemma=FORM2CANON[w]; break; }
+        // two-word predicates (depends on, leads to)
+        const two=(w+" "+(words[i+1]||"").toLowerCase().replace(/[^a-z\-]/g,""));
+        if(FORM2CANON[two]){ vi=i; lemma=FORM2CANON[two]; break; }
+        if(!STOP.has(w) && /(s|ed|es|ing)$/.test(w) && i>=1){
+          vi=i; lemma=null; break;
+        }
+      }
+      if(vi<1) continue;
+      const before=words.slice(0,vi).join(" ");
+      const after=words.slice(vi+1).join(" ");
+      const sH=headNoun(before), oH=headNoun(after);
+      if(!sH||!oH) continue;
+      atoms.push({sH,oH,lemma, raw:clause.trim()});
+    }
+  }
+  return atoms;
+}
+
+function economy(sentence,edits){
+  let out=sentence;
+  for(const [pat,rep] of DEAD_WEIGHT.concat(HEDGES)){
+    const ne=out.replace(pat,(m)=>{
+      const word=m.trim().toLowerCase();
+      return PROTECTED.has(word)?m:rep;
+    });
+    if(ne!==out){ edits.push({kind:"economy",before:out.trim(),after:ne.trim()}); out=ne; }
+  }
+  out=out.replace(/\s{2,}/g," ").trim();
+  if(out && out[0]===out[0].toLowerCase() && /[a-z]/.test(out[0])) out=out[0].toUpperCase()+out.slice(1);
+  return out;
+}
+function answerFirst(sents,edits){
+  if(!sents.length) return sents;
+  const isDef=s=>/^[A-Z][\w\-]*\s+is\b/.test(s);
+  if(isDef(sents[0])) return sents;
+  for(let i=1;i<sents.length;i++){
+    if(isDef(sents[i])){
+      if(edits) edits.push({kind:"answer-first",moved:sents[i].slice(0,60),from:i,to:0});
+      return [sents[i]].concat(sents.slice(0,i)).concat(sents.slice(i+1));
+    }
+  }
+  return sents;
+}
+function stanceFrame(tail){
+  const t=(tail||"+==T").trim();
+  const posture = (t[0]==="+"||t[0]==="|")?t[0]:"+";
+  const anchor = (t[t.length-1]==="T"||t[t.length-1]==="F")?t[t.length-1]:"T";
+  const mid=t.slice(1,-1)||"=";
+  const view = mid.includes(">")?">":(mid.includes("<")?"<":"=");
+  return {posture,view,anchor};
+}
+function opening(st,subject){
+  if(st.posture==="|"){
+    return st.anchor==="F"
+      ? `The record on ${subject}, as its own documentation gives it.`
+      : `What the record shows about ${subject}.`;
+  }
+  return "";
+}
+function closing(st){
+  if(st.view==="<") return st.anchor==="T"
+    ? "Where this is uncertain, the source does not say more — and neither will I."
+    : "Where this is uncertain, the source does not say more.";
+  if(st.view===">") return "Each claim above is the source's own; it holds as stated.";
+  return "";
+}
+
+function verify(atoms,prose){
+  const outS=sentences(prose).map(s=>s.toLowerCase());
+  const joined=prose.toLowerCase();
+  let held=0; const missing=[];
+  for(const a of atoms){
+    const predOk = a.lemma ? stemMatch(a.lemma,joined) : true; // unknown verb: don't penalise
+    const co = (a.sH&&a.oH) ? outS.some(s=>s.includes(a.sH)&&s.includes(a.oH)) : false;
+    if(co&&predOk) held++;
+    else missing.push({s:a.sH,p:a.lemma||"~",o:a.oH,co,predOk});
+  }
+  const total=atoms.length;
+  return {score: total?+(held/total).toFixed(3):1, held, total, missing};
+}
+
+function materialise(text,tail){
+  const edits=[];
+  const atoms=extractAtoms(text);
+  const st=stanceFrame(tail);
+  let sents=sentences(text);
+  sents=answerFirst(sents,edits);
+  sents=sents.map(s=>economy(s,edits));
+  const subject = atoms.length? atoms[0].sH : "this";
+  const op=opening(st,subject), cl=closing(st);
+  const body=sents.join(" ");
+  let prose=[op,body,cl].filter(Boolean).join(" ");
+  const ret=verify(atoms,prose);
+  let retnote="";
+  if(ret.total && ret.score<1){
+    const lost=ret.missing.slice(0,3).map(m=>`${m.s}–${m.p}–${m.o}`).join(", ");
+    retnote=`[Retention check: ${ret.held}/${ret.total} source claims verified in this rendering; not carried: ${lost}.]`;
+    prose+=" "+retnote;
+    edits.push({kind:"self-correction",note:"imperfect retention declared in-line per TD VI"});
+  }
+  return {source:text,prose,retention:ret,edits,retnote,
+    stance:`${st.posture}${st.view}=${st.anchor}`};
+}
+
+/* ============================================================
+   UI & LOCAL EXECUTION
+   ============================================================ */
+let lastRender=null;
+const bySelector=s=>document.querySelector(s);
+const out=bySelector("[id='out']"), status=bySelector("[id='status']"), runBtn=bySelector("[id='run']"), dlBtn=bySelector("[id='dl']");
+
+function activeTail(){
+  const b=document.querySelector("[id='stance'] button[aria-pressed='true']");
+  return b?b.dataset.tail:"+==T";
+}
+
+function setStatus(msg,busy){
+  status.innerHTML = msg ? (busy?'<span class="dot"></span>':'')+msg : "";
+}
+function escapeHtml(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+
+// segmented toggles
+document.querySelectorAll(".seg").forEach(seg=>{
+  seg.addEventListener("click",e=>{
+    const btn=e.target.closest("button"); if(!btn)return;
+    seg.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed", b===btn?"true":"false"));
+  });
+});
+
+function renderEssay(topic,spine,mat){
+  const r=mat.retention;
+  const full = r.total && r.score>=1;
+  const pct = r.total? Math.round(r.score*100) : 100;
+  // strip the inline retnote from the displayed materialised prose; show it styled instead
+  let matProse=mat.prose, note="";
+  if(mat.retnote){ matProse=matProse.replace(" "+mat.retnote,""); note=`<span class="retnote">${escapeHtml(mat.retnote)}</span>`; }
+
+  let auditHtml="";
+  if(mat.edits.length){
+    auditHtml=`<details class="audit"><summary>Audit trail — ${mat.edits.length} edit${mat.edits.length>1?"s":""} · stance ${mat.stance}</summary><div class="edits">`+
+      mat.edits.map(e=>{
+        if(e.kind==="economy") return `<div class="e"><span class="k">economy</span> &nbsp;${escapeHtml(e.before.slice(0,70))} <span class="k">→</span> ${escapeHtml(e.after.slice(0,70))}</div>`;
+        if(e.kind==="answer-first") return `<div class="e"><span class="k">answer-first</span> &nbsp;moved “${escapeHtml(e.moved)}” to front</div>`;
+        return `<div class="e"><span class="k">${escapeHtml(e.kind)}</span> &nbsp;${escapeHtml(e.note||"")}</div>`;
+      }).join("")+`</div></details>`;
+  }
+
+  out.innerHTML=`<article class="essay">
+    <div class="head">
+      <div style="flex:1 1 100%;display:flex;justify-content:space-between;align-items:baseline;gap:.6rem">
+        <span class="vol">Compendium entry</span>
+        <span class="ret ${full?'full':''}">retention ${r.held}/${r.total} · ${pct}%</span>
+      </div>
+      <h2>${escapeHtml(topic)}</h2>
+    </div>
+    <div class="panes">
+      <div class="pane src">
+        <div class="ptag">Source text — user-supplied</div>
+        <div class="prose">${escapeHtml(spine)}</div>
+      </div>
+      <div class="pane mat">
+        <div class="ptag">Materialised — Truthful Devotion · deterministic</div>
+        <div class="prose">${escapeHtml(matProse)} ${note}</div>
+      </div>
+    </div>
+    ${auditHtml}
+  </article>`;
+
+  lastRender={topic,spine,mat};
+  dlBtn.disabled=false;
+}
+
+function run(){
+  const topic = bySelector("[id='topic']").value.trim() || "Untitled Entry";
+  const prose = bySelector("[id='spine']").value.trim();
+  if(!prose){
+    setStatus("Paste source text first.");
+    return;
+  }
+  runBtn.disabled=true; dlBtn.disabled=true;
+  setStatus("Materialising — deterministic TD render + atom retention…",true);
+  try{
+    const mat=materialise(prose,activeTail());
+    renderEssay(topic,prose,mat);
+    setStatus(`Done. ${mat.retention.held}/${mat.retention.total} atoms held in the rendering. Retention is fidelity, not truth.`);
+  }catch(err){
+    out.innerHTML=`<div class="err"><b>Failed</b><br>${escapeHtml(err.message)}</div>`;
+    setStatus("");
+  }finally{
+    runBtn.disabled=false;
+  }
+}
+
+function downloadMd(){
+  if(!lastRender) return;
+  const {topic,spine,mat}=lastRender;
+  const r=mat.retention, pct=r.total?Math.round(r.score*100):100;
+  let md=`## ${topic}\n\n*Retention: ${r.held}/${r.total} (${pct}%) · ${mat.edits.length} TD edits · stance ${mat.stance}*\n\n`;
+  md+=`**Materialised (Truthful Devotion).**\n\n${mat.prose}\n\n`;
+  md+=`**Source prose.**\n\n${spine}\n\n`;
+  md+=`---\n\n_Retention measures rendering fidelity, not factual truth. Generated ${new Date().toISOString().slice(0,10)}._\n`;
+  const blob=new Blob([md],{type:"text/markdown"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download=topic.toLowerCase().replace(/[^a-z0-9]+/g,"_").replace(/^_|_$/g,"").slice(0,50)+".md";
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+runBtn.addEventListener("click",run);
+dlBtn.addEventListener("click",downloadMd);
+bySelector("[id='topic']").addEventListener("keydown",e=>{ if(e.key==="Enter") run(); });
+</script>
+</body>
+</html>

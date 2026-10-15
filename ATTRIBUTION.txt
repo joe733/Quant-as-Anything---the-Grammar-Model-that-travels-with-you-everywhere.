@@ -1,0 +1,6 @@
+Quant
+Creator: Joe Smith
+Publisher: Fiduci Group
+© 2026 Joe Smith · Fiduci Group
+
+Publisher attribution is not Apple Developer ID verification. This source archive is not Developer ID signed or notarized. Build-on-Mac.command produces a local ad-hoc signature. Genuine distribution signing needs the actual installed Developer ID Application certificate and notary credentials on a Mac. No certificate or private key is included. Hashes identify bytes, not authorship or absolute safety.

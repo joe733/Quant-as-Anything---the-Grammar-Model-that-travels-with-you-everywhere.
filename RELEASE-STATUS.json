@@ -1,0 +1,27 @@
+{
+  "status": "CHECKED_MACOS_SOURCE_NATIVE_RELEASE_PENDING",
+  "version": "0.3.2",
+  "build": 5,
+  "native_build_executed": false,
+  "native_ui_acceptance_complete": false,
+  "developer_id_signed": false,
+  "notarized": false,
+  "creator_attribution": "Joe Smith",
+  "publisher_attribution": "Fiduci Group",
+  "entrypoint": "Start-Quant.command",
+  "active_books": 32,
+  "active_contexts": 3,
+  "active_books_scope": "Working interpretation of requested capacity; not a claim that 32 Book files were supplied.",
+  "missing_integrations": [
+    "MQB action execution",
+    "encrypted credential ledger",
+    "external service integrations",
+    "Quant-as-Astronomer runtime"
+  ],
+  "currently_unavailable_uploads": [
+    "Quant-as-Astronomer.py",
+    "Quant-Complete-macOS-Xcode.zip",
+    "Quant-macOS-Browser-Project.zip"
+  ],
+  "evidence": "TEST-REPORT.md"
+}

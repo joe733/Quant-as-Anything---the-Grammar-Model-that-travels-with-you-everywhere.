@@ -1,0 +1,16 @@
+claims=100000
+ingest_s=1.0842
+ingest_claims_per_s=92232.1
+queries=1000
+query_total_s=0.0569
+query_avg_ms=0.0569
+db_size_mb=18.23
+max_rss_mb=98.54
+claims=1000000
+ingest_s=20.7541
+ingest_claims_per_s=48183.2
+queries=1000
+query_total_s=0.4751
+query_avg_ms=0.4751
+db_size_mb=184.68
+max_rss_mb=98.54

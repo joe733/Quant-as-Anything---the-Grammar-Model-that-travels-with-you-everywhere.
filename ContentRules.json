@@ -1,0 +1,15 @@
+[
+  {"trigger":{"url-filter":".*","resource-type":["script","font","raw","media","svg-document","popup"]},"action":{"type":"block"}},
+  {"trigger":{"url-filter":".*","resource-type":["image","style-sheet"],"load-type":["third-party"]},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"^http:"},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"^ws"},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"^file:"},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"^data:"},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"^blob:"},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"^ftp:"},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"^https://[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+[/:]"},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"^https://\\["},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"^https://localhost"},"action":{"type":"block"}},
+  {"trigger":{"url-filter":".*"},"action":{"type":"block-cookies"}},
+  {"trigger":{"url-filter":".*"},"action":{"type":"css-display-none","selector":"iframe, frame, frameset, object, embed, video, audio, form, input, textarea, select, button, canvas"}}
+]

@@ -1,0 +1,52 @@
+{
+  "date": "2026-10-15",
+  "request": "macOS, Windows, Android APK, iPhone, Linux",
+  "macOS": {
+    "deliverable": "Source project with original Room and Studio",
+    "installable_binary": false,
+    "remaining": [
+      "Compile with Xcode",
+      "Native workflow and visual acceptance",
+      "Developer ID signing and notarization"
+    ]
+  },
+  "Windows": {
+    "deliverable": null,
+    "installable_binary": false,
+    "remaining": [
+      "Native port with equivalent browser and local-file boundaries",
+      "Windows build tools and runtime",
+      "Build, test and sign"
+    ]
+  },
+  "Android": {
+    "deliverable": null,
+    "apk": false,
+    "remaining": [
+      "Native port including import/export, permissions and browser policy",
+      "Android SDK and build tools",
+      "Build/sign APK and test on device"
+    ]
+  },
+  "iPhone": {
+    "deliverable": null,
+    "ipa": false,
+    "remaining": [
+      "iOS port including Files import/export and browser policy",
+      "Xcode/iOS SDK and authorized signing/provisioning",
+      "Build and test on device"
+    ]
+  },
+  "Linux": {
+    "deliverable": null,
+    "installable_binary": false,
+    "remaining": [
+      "Desktop port and file/browser policy implementation",
+      "Supported GUI runtime/build dependencies",
+      "Build/package and test"
+    ]
+  },
+  "available_tools": "Node, Python and GCC; Java executable without javac. No Xcode, Swift, Android SDK, Gradle, .NET, Qt, GTK/WebKit development packages, Electron or Tauri found in checked locations.",
+  "dependencies_downloaded": false,
+  "platform_note": "A renamed ZIP or web page is not an APK, iPhone app or native desktop installer. No such binaries were produced."
+}

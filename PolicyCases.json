@@ -1,0 +1,520 @@
+[
+  {
+    "name": "Allowed public address: https://example.com",
+    "function": "inspectURL",
+    "input": "https://example.com",
+    "allowed": true
+  },
+  {
+    "name": "Allowed public address: https://example.org/path?q=ink#page",
+    "function": "inspectURL",
+    "input": "https://example.org/path?q=ink#page",
+    "allowed": true
+  },
+  {
+    "name": "Allowed public address: https://EXAMPLE.com:443/",
+    "function": "inspectURL",
+    "input": "https://EXAMPLE.com:443/",
+    "allowed": true
+  },
+  {
+    "name": "Allowed public address: https://docs.example.com/a%20b",
+    "function": "inspectURL",
+    "input": "https://docs.example.com/a%20b",
+    "allowed": true
+  },
+  {
+    "name": "Allowed public address: https://xn--bcher-kva.de/",
+    "function": "inspectURL",
+    "input": "https://xn--bcher-kva.de/",
+    "allowed": true
+  },
+  {
+    "name": "Blocked address ",
+    "function": "inspectURL",
+    "input": "",
+    "allowed": false
+  },
+  {
+    "name": "Blocked address None",
+    "function": "inspectURL",
+    "input": null,
+    "allowed": false
+  },
+  {
+    "name": "Blocked address http://example.com",
+    "function": "inspectURL",
+    "input": "http://example.com",
+    "allowed": false
+  },
+  {
+    "name": "Blocked address file:///etc/passwd",
+    "function": "inspectURL",
+    "input": "file:///etc/passwd",
+    "allowed": false
+  },
+  {
+    "name": "Blocked address javascript:alert(1)",
+    "function": "inspectURL",
+    "input": "javascript:alert(1)",
+    "allowed": false
+  },
+  {
+    "name": "Blocked address data:text/html,hello",
+    "function": "inspectURL",
+    "input": "data:text/html,hello",
+    "allowed": false
+  },
+  {
+    "name": "Blocked address blob:https://example.com/x",
+    "function": "inspectURL",
+    "input": "blob:https://example.com/x",
+    "allowed": false
+  },
+  {
+    "name": "Blocked address ftp://example.com",
+    "function": "inspectURL",
+    "input": "ftp://example.com",
+    "allowed": false
+  },
+  {
+    "name": "Blocked address ws://example.com",
+    "function": "inspectURL",
+    "input": "ws://example.com",
+    "allowed": false
+  },
+  {
+    "name": "Blocked address https://127.0.0.1/",
+    "function": "inspectURL",
+    "input": "https://127.0.0.1/",
+    "allowed": false
+  },
+  {
+    "name": "Blocked address https://2130706433",
+    "function": "inspectURL",
+    "input": "https://2130706433",
+    "allowed": false
+  },
+  {
+    "name": "Blocked address https://0x7f000001",
+    "function": "inspectURL",
+    "input": "https://0x7f000001",
+    "allowed": false
+  },
+  {
+    "name": "Blocked address https://[::1]/",
+    "function": "inspectURL",
+    "input": "https://[::1]/",
+    "allowed": false
+  },
+  {
+    "name": "Blocked address https://example.com:22/",
+    "function": "inspectURL",
+    "input": "https://example.com:22/",
+    "allowed": false
+  },
+  {
+    "name": "Blocked address https://user:secret@example.com/",
+    "function": "inspectURL",
+    "input": "https://user:secret@example.com/",
+    "allowed": false
+  },
+  {
+    "name": "Blocked address https://example.com@127.0.0.1/",
+    "function": "inspectURL",
+    "input": "https://example.com@127.0.0.1/",
+    "allowed": false
+  },
+  {
+    "name": "Blocked address https://%65xample.com/",
+    "function": "inspectURL",
+    "input": "https://%65xample.com/",
+    "allowed": false
+  },
+  {
+    "name": "Blocked address https://localhost/",
+    "function": "inspectURL",
+    "input": "https://localhost/",
+    "allowed": false
+  },
+  {
+    "name": "Blocked address https://private.local/",
+    "function": "inspectURL",
+    "input": "https://private.local/",
+    "allowed": false
+  },
+  {
+    "name": "Blocked address https://router.home.arpa/",
+    "function": "inspectURL",
+    "input": "https://router.home.arpa/",
+    "allowed": false
+  },
+  {
+    "name": "Blocked address https://device.lan/",
+    "function": "inspectURL",
+    "input": "https://device.lan/",
+    "allowed": false
+  },
+  {
+    "name": "Blocked address https://service.internal/",
+    "function": "inspectURL",
+    "input": "https://service.internal/",
+    "allowed": false
+  },
+  {
+    "name": "Blocked address https://private.onion/",
+    "function": "inspectURL",
+    "input": "https://private.onion/",
+    "allowed": false
+  },
+  {
+    "name": "Blocked address https://example.com./",
+    "function": "inspectURL",
+    "input": "https://example.com./",
+    "allowed": false
+  },
+  {
+    "name": "Blocked address https://bad..example.com/",
+    "function": "inspectURL",
+    "input": "https://bad..example.com/",
+    "allowed": false
+  },
+  {
+    "name": "Blocked address https://-bad.example.com/",
+    "function": "inspectURL",
+    "input": "https://-bad.example.com/",
+    "allowed": false
+  },
+  {
+    "name": "Blocked address https://example.com\\@evil.org",
+    "function": "inspectURL",
+    "input": "https://example.com\\@evil.org",
+    "allowed": false
+  },
+  {
+    "name": "Blocked address https://example.com/\nsecret",
+    "function": "inspectURL",
+    "input": "https://example.com/\nsecret",
+    "allowed": false
+  },
+  {
+    "name": "Blocked address https://example.com/\u202eevil",
+    "function": "inspectURL",
+    "input": "https://example.com/\u202eevil",
+    "allowed": false
+  },
+  {
+    "name": "Blocked address https://aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.co",
+    "function": "inspectURL",
+    "input": "https://aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.com/",
+    "allowed": false
+  },
+  {
+    "name": "Blocked address https://example.com/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "function": "inspectURL",
+    "input": "https://example.com/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "allowed": false
+  },
+  {
+    "name": "Intent typed",
+    "function": "navigation",
+    "input": {
+      "url": "https://example.com/",
+      "enabled": true,
+      "mainFrame": true,
+      "method": "GET",
+      "download": false,
+      "intent": "typed"
+    },
+    "allowed": true
+  },
+  {
+    "name": "Intent link",
+    "function": "navigation",
+    "input": {
+      "url": "https://example.com/",
+      "enabled": true,
+      "mainFrame": true,
+      "method": "GET",
+      "download": false,
+      "intent": "link"
+    },
+    "allowed": true
+  },
+  {
+    "name": "Intent backForward",
+    "function": "navigation",
+    "input": {
+      "url": "https://example.com/",
+      "enabled": true,
+      "mainFrame": true,
+      "method": "GET",
+      "download": false,
+      "intent": "backForward"
+    },
+    "allowed": true
+  },
+  {
+    "name": "Intent reload",
+    "function": "navigation",
+    "input": {
+      "url": "https://example.com/",
+      "enabled": true,
+      "mainFrame": true,
+      "method": "GET",
+      "download": false,
+      "intent": "reload"
+    },
+    "allowed": true
+  },
+  {
+    "name": "Intent redirect",
+    "function": "navigation",
+    "input": {
+      "url": "https://example.com/",
+      "enabled": true,
+      "mainFrame": true,
+      "method": "GET",
+      "download": false,
+      "intent": "redirect"
+    },
+    "allowed": true
+  },
+  {
+    "name": "Reject navigation enabled=False",
+    "function": "navigation",
+    "input": {
+      "url": "https://example.com/",
+      "enabled": false,
+      "mainFrame": true,
+      "method": "GET",
+      "download": false,
+      "intent": "typed"
+    },
+    "allowed": false
+  },
+  {
+    "name": "Reject navigation mainFrame=False",
+    "function": "navigation",
+    "input": {
+      "url": "https://example.com/",
+      "enabled": true,
+      "mainFrame": false,
+      "method": "GET",
+      "download": false,
+      "intent": "typed"
+    },
+    "allowed": false
+  },
+  {
+    "name": "Reject navigation method=POST",
+    "function": "navigation",
+    "input": {
+      "url": "https://example.com/",
+      "enabled": true,
+      "mainFrame": true,
+      "method": "POST",
+      "download": false,
+      "intent": "typed"
+    },
+    "allowed": false
+  },
+  {
+    "name": "Reject navigation method=PUT",
+    "function": "navigation",
+    "input": {
+      "url": "https://example.com/",
+      "enabled": true,
+      "mainFrame": true,
+      "method": "PUT",
+      "download": false,
+      "intent": "typed"
+    },
+    "allowed": false
+  },
+  {
+    "name": "Reject navigation method=HEAD",
+    "function": "navigation",
+    "input": {
+      "url": "https://example.com/",
+      "enabled": true,
+      "mainFrame": true,
+      "method": "HEAD",
+      "download": false,
+      "intent": "typed"
+    },
+    "allowed": false
+  },
+  {
+    "name": "Reject navigation download=True",
+    "function": "navigation",
+    "input": {
+      "url": "https://example.com/",
+      "enabled": true,
+      "mainFrame": true,
+      "method": "GET",
+      "download": true,
+      "intent": "typed"
+    },
+    "allowed": false
+  },
+  {
+    "name": "Reject navigation intent=unrequested",
+    "function": "navigation",
+    "input": {
+      "url": "https://example.com/",
+      "enabled": true,
+      "mainFrame": true,
+      "method": "GET",
+      "download": false,
+      "intent": "unrequested"
+    },
+    "allowed": false
+  },
+  {
+    "name": "Reject navigation intent=form",
+    "function": "navigation",
+    "input": {
+      "url": "https://example.com/",
+      "enabled": true,
+      "mainFrame": true,
+      "method": "GET",
+      "download": false,
+      "intent": "form"
+    },
+    "allowed": false
+  },
+  {
+    "name": "Reject navigation url=https://127.0.0.1/",
+    "function": "navigation",
+    "input": {
+      "url": "https://127.0.0.1/",
+      "enabled": true,
+      "mainFrame": true,
+      "method": "GET",
+      "download": false,
+      "intent": "typed"
+    },
+    "allowed": false
+  },
+  {
+    "name": "Response mime=text/plain",
+    "function": "response",
+    "input": {
+      "url": "https://example.com/",
+      "mainFrame": true,
+      "mime": "text/plain",
+      "length": 2048,
+      "download": false
+    },
+    "allowed": true
+  },
+  {
+    "name": "Response mime=application/pdf",
+    "function": "response",
+    "input": {
+      "url": "https://example.com/",
+      "mainFrame": true,
+      "mime": "application/pdf",
+      "length": 2048,
+      "download": false
+    },
+    "allowed": false
+  },
+  {
+    "name": "Response mime=image/svg+xml",
+    "function": "response",
+    "input": {
+      "url": "https://example.com/",
+      "mainFrame": true,
+      "mime": "image/svg+xml",
+      "length": 2048,
+      "download": false
+    },
+    "allowed": false
+  },
+  {
+    "name": "Response mime=application/xhtml+xml",
+    "function": "response",
+    "input": {
+      "url": "https://example.com/",
+      "mainFrame": true,
+      "mime": "application/xhtml+xml",
+      "length": 2048,
+      "download": false
+    },
+    "allowed": false
+  },
+  {
+    "name": "Response mime=application/octet-stream",
+    "function": "response",
+    "input": {
+      "url": "https://example.com/",
+      "mainFrame": true,
+      "mime": "application/octet-stream",
+      "length": 2048,
+      "download": false
+    },
+    "allowed": false
+  },
+  {
+    "name": "Response mainFrame=False",
+    "function": "response",
+    "input": {
+      "url": "https://example.com/",
+      "mainFrame": false,
+      "mime": "text/html",
+      "length": 2048,
+      "download": false
+    },
+    "allowed": false
+  },
+  {
+    "name": "Response download=True",
+    "function": "response",
+    "input": {
+      "url": "https://example.com/",
+      "mainFrame": true,
+      "mime": "text/html",
+      "length": 2048,
+      "download": true
+    },
+    "allowed": false
+  },
+  {
+    "name": "Response length=9437184",
+    "function": "response",
+    "input": {
+      "url": "https://example.com/",
+      "mainFrame": true,
+      "mime": "text/html",
+      "length": 9437184,
+      "download": false
+    },
+    "allowed": false
+  },
+  {
+    "name": "Response length=-1",
+    "function": "response",
+    "input": {
+      "url": "https://example.com/",
+      "mainFrame": true,
+      "mime": "text/html",
+      "length": -1,
+      "download": false
+    },
+    "allowed": true
+  },
+  {
+    "name": "Response url=http://example.com",
+    "function": "response",
+    "input": {
+      "url": "http://example.com",
+      "mainFrame": true,
+      "mime": "text/html",
+      "length": 2048,
+      "download": false
+    },
+    "allowed": false
+  }
+]

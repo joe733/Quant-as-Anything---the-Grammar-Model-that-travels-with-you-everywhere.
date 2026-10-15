@@ -1,0 +1,11 @@
+REMOVING QUANT — Joe Smith / Fiduci Group
+
+Save any room/model cards you want to keep, then quit Quant with Command-Q.
+Move Quant.app to Trash in Finder. A local build is in Build/Build/Products/Release.
+To remove stored rooms and preferences as well, after quitting use Finder > Go > Go to Folder:
+~/Library/Containers/com.fiducigroup.quant.browser
+Move that specific Quant container to Trash. This removes stored work; export it first if wanted.
+Your exported files and installed starter folders remain where you chose to save them.
+You can also trash the extracted project, Build folder and downloaded source ZIP.
+Quant installs no login item, LaunchAgent, daemon, extension, privileged helper or updater.
+This document performs no deletion. Trash can be restored until it is emptied.

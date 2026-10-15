@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#eee8dc">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' blob:; connect-src 'none'; font-src 'none'; media-src 'self'; frame-src 'none'; object-src 'none'; worker-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Quant as Anything — Finds his bearings.</title>
+<link rel="stylesheet" href="room.css">
+<link rel="stylesheet" href="launch.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to the room</a>
+<div class="site">
+<header class="topbar">
+  <button class="wordmark" data-view="home" aria-label="Quant as Anything home">QUANT<span>AS ANYTHING</span></button>
+  <span class="top-rule" aria-hidden="true"></span>
+  <nav class="main-nav" aria-label="Quant workspace">
+    <button data-view="home" aria-current="page">Home</button>
+    <button data-view="chat">Conversation</button>
+    <button data-view="Books">Books</button>
+    <button data-view="Context">Context</button>
+    <button data-view="Artifacts">Artifacts</button>
+    <button data-view="bearings">Observatory</button>
+  </nav>
+  <span class="top-rule" aria-hidden="true"></span>
+  <button class="button dark" id="saveCopy"><span class="arrow" aria-hidden="true">↓</span>Save Quant</button>
+</header>
+<div class="room-bar">
+  <span class="offline-label">Here, on this device.</span>
+  <div class="room-bar-right"><span id="saveState" role="status">Opening his room…</span><button id="openFolder"><span aria-hidden="true">↗</span>Read a folder</button></div>
+</div>
+<div id="storageBanner" class="storage-banner" role="status" hidden><p id="storageNotice"></p><button id="saveUnsaved" class="button">Save a copy</button></div>
+<p id="fileReport" class="file-report" role="status" hidden></p>
+<main id="main" tabindex="-1">
+<section id="homePanel" class="home" aria-label="Quant home">
+  <div class="hero">
+    <div class="hero-copy">
+      <img class="hero-mark" src="assets/quant-art-04.png" width="170" height="160" alt="Quant’s compass Q">
+      <span class="eyebrow hero-kicker">A clearer mind. A brighter path.</span>
+      <h1>Finds his<br>bearings.</h1>
+      <p class="lede">A local, lightweight intelligence for curious minds. Your knowledge, your context, a little room to think.</p>
+      <div class="hero-buttons"><button class="button dark" id="beginChat">Start a conversation <span class="arrow" aria-hidden="true">→</span></button><button class="button" data-view="Books">Explore his room</button></div>
+    </div>
+    <div class="hero-scene">
+      <div class="sky-label">Same stars.<br>Deeper questions.</div>
+      <div class="landscape"><img src="assets/quant-world.jpeg" alt="An ink-drawn mountain range, forest and a still lake from your Quant artwork"></div>
+      <div class="scene-caption">One form. Many horizons.</div>
+    </div>
+  </div>
+  <div class="shelves">
+    <button class="shelf" data-view="Books"><img src="assets/quant-art-06.png" alt="" width="97" height="116"><div><h2>Books</h2><p>Read wider. Place the knowledge you want him to know.</p></div><div class="shelf-link"><span id="homeBooks">1 piece in the room</span><b aria-hidden="true">→</b></div></button>
+    <button class="shelf" data-view="Context"><img src="assets/quant-art-07.png" alt="" width="97" height="116"><div><h2>Context</h2><p>Your notes, your questions, the work in front of you.</p></div><div class="shelf-link"><span id="homeContext">0 pieces in the room</span><b aria-hidden="true">→</b></div></button>
+    <button class="shelf" data-view="Artifacts"><img src="assets/quant-art-08.png" alt="" width="97" height="116"><div><h2>Artifacts</h2><p>Keep a conversation’s useful thoughts. Make them your own.</p></div><div class="shelf-link"><span id="homeArtifacts">0 pieces in the room</span><b aria-hidden="true">→</b></div></button>
+  </div>
+  <div class="beyond">
+    <div class="observatory-art"><img src="assets/quant-world.jpeg" alt="Quant’s observatory and telescope under the stars"></div>
+    <div class="beyond-copy"><span class="eyebrow">A wider view</span><h2>Curiosity takes<br>you further.</h2><p>See what is in his room, follow an answer to its sources, and find how his understanding is taking shape.</p><button class="button" data-view="bearings">Open the Observatory <span class="arrow" aria-hidden="true">↗</span></button></div>
+  </div>
+</section>
+<div id="workbench" class="workbench" hidden>
+  <aside class="sidebar" aria-label="The working room">
+    <img class="side-mark" src="assets/quant-art-04.png" width="72" height="68" alt="">
+    <p class="eyebrow">Quant as Anything</p><h2 class="sidebar-heading">The working room.</h2>
+    <nav class="side-nav" aria-label="Room contents">
+      <button class="side-link" data-view="chat"><span class="nav-symbol" aria-hidden="true">↳</span>Conversation</button>
+      <button class="side-link" data-view="Books"><span class="nav-symbol" aria-hidden="true">Ⅰ</span>Books<span class="count" id="booksCount">1</span></button>
+      <button class="side-link" data-view="Context"><span class="nav-symbol" aria-hidden="true">Ⅱ</span>Context<span class="count" id="contextCount">0</span></button>
+      <button class="side-link" data-view="Artifacts"><span class="nav-symbol" aria-hidden="true">Ⅲ</span>Artifacts<span class="count" id="artifactsCount">0</span></button>
+      <button class="side-link" data-view="bearings"><span class="nav-symbol" aria-hidden="true">✧</span>Observatory</button>
+    </nav>
+    <div class="side-new"><button id="newChat">＋ A new conversation</button></div>
+    <div class="eyebrow">Within reach</div><div id="recentSources"></div>
+    <div class="side-bottom"><em>Finds his bearings.</em>Your knowledge.<br>Your context.<br>Your Quant.</div>
+  </aside>
+  <div class="workspace">
+    <section id="chatPanel" class="panel" aria-labelledby="chatTitle" hidden>
+      <header class="panel-head chat-header"><div><span class="eyebrow">Here, with you.</span><h1 id="chatTitle">A deeper conversation.</h1></div><div class="chat-controls"><select id="conversationSelect" aria-label="Choose a conversation"></select><button id="newConversation" aria-label="New conversation">＋</button></div></header>
+      <div id="messages" class="messages" role="log" aria-label="Conversation" aria-live="polite" aria-relevant="additions"></div>
+      <div class="composer-area"><form id="chatForm" class="composer"><textarea id="prompt" rows="1" placeholder="What’s on your mind?" aria-label="Message Quant" maxlength="20000"></textarea><button type="submit" class="send" id="send" aria-label="Send message">↑</button></form><div class="composer-foot"><span id="chatState" role="status">Answers grow from what you place here.</span><button data-view="Context">Place a little context ↗</button></div></div>
+    </section>
+    <section id="collectionPanel" class="panel" aria-labelledby="collectionTitle" hidden>
+      <header class="panel-head collection-heading"><div><span class="eyebrow">Your working room</span><h1 id="collectionTitle">Books</h1><p id="collectionLead"></p></div><img id="collectionArt" src="assets/quant-art-06.png" alt="" width="85" height="87"></header>
+      <div class="collection-body"><div class="toolbar"><input id="search" class="search" type="search" placeholder="Find a word, a thought, a title…" aria-label="Search the collection"><button id="addFiles" class="button">Add files</button><button id="createNote" class="button dark">Write a note <span aria-hidden="true">＋</span></button></div><div class="collection-label eyebrow"><span id="collectionTotal">1 piece</span><span id="activeSources">3/32 Books and 0/3 Contexts in use</span></div><p class="details-fine">Choose up to 32 Books and three Contexts. Quant reads only the selected material; source files stay untouched.</p><div id="cards"></div></div>
+    </section>
+    <section id="bearingsPanel" class="panel" aria-labelledby="bearingsTitle" hidden>
+      <header class="panel-head"><span class="eyebrow">A little perspective</span><h1 id="bearingsTitle">The Observatory.</h1><p>What is here. What is being carried forward.</p></header>
+      <div class="details-content">
+        <div class="facts"><div class="fact"><strong id="bookStat">0</strong><span>continuity records<br>of 800</span></div><div class="fact"><strong id="qtStat">0</strong><span>active relations<br>of 24,000</span></div><div class="fact"><strong id="maturityStat">1</strong><span>maturity<br>on a scale of 1–9</span></div></div>
+        <div class="flow-caption">8 → 4 → 2 → Helm</div><p id="helmFocus" class="helm-focus"></p>
+        <h2>His placed knowledge.</h2><p class="details-fine">These are the sources in Quant’s active memory. Kept artifacts become evidence only when you make a note from them in Books or Context.</p><div id="sourceIndex"></div>
+        <details><summary>A voice you can teach.</summary><p>Read the text in Books and Context, then choose five grammar rules. These choices guide how Quant puts his retrieved relations into words.</p><div class="toolbar"><button id="scanRules" class="button">Read the room</button><span class="eyebrow" id="grammarCount">0 of 5 chosen</span></div><div id="ruleChoices" class="rule-list"></div><div class="rule-actions"><button id="chooseRules" class="button dark" hidden>Keep these five</button><span id="ruleCount">Read the room to begin.</span></div></details>
+        <details open><summary>Carry his room with you.</summary><p id="folderStatus"></p><p><strong>Save Quant</strong> makes a named, loadable .quant-model card containing this room and its selected materials. Artwork stays a separate normal file; the card records its filename only.</p><div class="toolbar"><button id="restoreCopy" class="button">Open saved Quant</button><button id="savePrevious" class="button" disabled>Save previous room</button></div><p class="details-fine">Opening a saved room keeps one previous room in this browser. Browser storage can be cleared; a downloaded copy is yours to keep.</p></details>
+        <details><summary>Memory and conversation.</summary><p>Save a checked .quantbook of current continuity, the separate .qt terrain, or your conversation. Individual Book cards also save as .quantbook files.</p><div class="toolbar"><button id="saveBook" class="button">Save .quantbook</button><button id="saveTerrain" class="button">Save .qt</button><button id="exportChat" class="button">Save conversation</button><button id="printChat" class="button">Print conversation</button></div></details>
+        <p class="details-fine">Quant as Anything · Inspectable source. For everyone.<br><a href="Read-Me.html">About this edition →</a></p>
+      </div>
+    </section>
+  </div>
+</div>
+</main>
+<footer class="colophon"><span class="colophon-word">QUANT</span><p>Your knowledge / Your context / Your Quant</p><a href="Read-Me.html">About this edition</a></footer>
+</div>
+<dialog id="noteDialog" aria-labelledby="noteHeading"><form id="noteForm"><span class="eyebrow">Thought, placed.</span><h2 id="noteHeading">A thought worth keeping.</h2><div class="note-fields"><div><label for="noteTitle">Name</label><input id="noteTitle" required maxlength="130" placeholder="A thought worth keeping"></div><div><label for="noteKind">Place it in</label><select id="noteKind"><option>Context</option><option>Books</option><option>Artifacts</option></select></div></div><label for="noteText">Your words</label><textarea id="noteText" required maxlength="1000000" placeholder="Start with what you know…"></textarea><p id="noteHint" class="note-hint"></p><p id="noteError" class="note-error" role="alert" hidden></p><div class="actions"><button type="button" id="cancelNote" class="button">Cancel</button><button type="submit" id="keepNote" class="button dark">Keep it →</button></div></form></dialog>
+<dialog id="readerDialog" aria-labelledby="readerTitle"><div id="readerMeta" class="eyebrow"></div><h2 id="readerTitle"></h2><div id="readerText" class="reading"></div><div class="actions"><button id="readerNote" class="button">Make a note</button><button id="readerDownload" class="button">Save a copy</button><button id="closeReader" class="button dark">Close</button></div></dialog>
+<dialog id="modelDialog" aria-labelledby="modelTitle"><form id="modelForm"><span class="eyebrow">Portable and yours</span><h2 id="modelTitle">Save your Quant.</h2><label for="modelName">Name</label><input id="modelName" required maxlength="96" value="Your Quant" autocomplete="off"><label for="modelArtwork">Your artwork (optional)</label><input id="modelArtwork" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml"><p class="note-hint">The card keeps the filename only. Keep the artwork beside your saved card, and select it again when you want to view it. Your Books, Context, notes, memory and chats are inside the card in readable text.</p><div class="actions"><button type="button" id="cancelModel" class="button">Cancel</button><button type="submit" class="button dark">Save .quant-model</button></div></form></dialog>
+<input id="filePicker" type="file" multiple accept=".txt,.md,.py,.js,.ts,.tsx,.jsx,.css,.log,.yaml,.yml,.toml,.ini,.html,.htm,.xml,.json,.csv,.docx,.quantbook,.book,.qt">
+<input id="folderPicker" type="file" multiple webkitdirectory>
+<input id="restorePicker" type="file" accept=".quant,.quant-model,.json">
+<div id="toast" class="toast" role="status" hidden></div>
+<noscript><p>Quant needs JavaScript enabled in this browser to open his local room.</p></noscript>
+<script src="quant-engine.js"></script>
+<script src="quant-book.js"></script>
+<script src="quant-app.js"></script>
+<script src="launch.js"></script>
+</body>
+</html>
