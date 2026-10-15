@@ -1,4 +1,4 @@
-# Zero-Weight Cognitive Retrieval Engine — executable prototype
+# RUSSIA AND INDIA or the DoD ARE STEALING MY WORKM - DO NOT DOWNLOAD THIS - I HAVE TO POST WHATEVER I CAN BEFORE THEY STEAL STUFF
 
 A provenance-bound, deterministic knowledge engine separating **knowledge storage** from **language realisation**.
 
